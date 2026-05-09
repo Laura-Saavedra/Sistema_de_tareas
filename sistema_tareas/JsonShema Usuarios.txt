@@ -1,0 +1,91 @@
+db.createCollection("usuarios", {
+
+  validator: {
+
+    $jsonSchema: {
+
+      bsonType: "object",
+
+      required: [
+        "usuarioId",
+        "nombre",
+        "correo",
+        "activo"
+      ],
+
+      properties: {
+
+        usuarioId: {
+          bsonType: "string",
+          description: "ID único del usuario"
+        },
+
+        nombre: {
+          bsonType: "string",
+          minLength: 3,
+          maxLength: 100
+        },
+
+        correo: {
+          bsonType: "string",
+          pattern: "^.+@.+\\..+$"
+        },
+
+        activo: {
+          bsonType: "bool"
+        },
+
+        edad: {
+          bsonType: "int",
+          minimum: 18,
+          maximum: 100
+        },
+
+        fechaRegistro: {
+          bsonType: "date"
+        },
+
+        agenda: {
+
+          bsonType: "array",
+
+          items: {
+
+            bsonType: "object",
+
+            required: [
+              "agendaId",
+              "titulo"
+            ],
+
+            properties: {
+
+              agendaId: {
+                bsonType: "string"
+              },
+
+              titulo: {
+                bsonType: "string"
+              },
+
+              fecha: {
+                bsonType: "date"
+              },
+
+              completado: {
+                bsonType: "bool"
+              }
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  }
+
+})
