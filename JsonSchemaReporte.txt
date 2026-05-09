@@ -1,0 +1,172 @@
+{
+"$schema": "http://json-schema.org/draft-07/schema#",
+
+"title": "Reporte",
+"description": "Esquema JSON del modelo Reporte del sistema de gestión.",
+
+"type": "object",
+
+"properties": {
+
+    "reporteId": {
+
+        "type": "string",
+
+        "maxLength": 20,
+
+        "description": "Identificador único del reporte"
+    },
+
+    "nombreReporte": {
+
+        "type": "string",
+
+        "maxLength": 200,
+
+        "description": "Nombre principal del reporte"
+    },
+
+    "descripcion": {
+
+        "type": [
+            "string",
+            "null"
+        ],
+
+        "description": "Descripción opcional del reporte"
+    },
+
+    "fechaGeneracion": {
+
+        "type": "string",
+
+        "format": "date-time",
+
+        "description": "Fecha automática de generación"
+    },
+
+    "totalUsuarios": {
+
+        "type": "integer",
+
+        "minimum": 0,
+
+        "description": "Cantidad total de usuarios"
+    },
+
+    "totalTareas": {
+
+        "type": "integer",
+
+        "minimum": 0,
+
+        "description": "Cantidad total de tareas"
+    },
+
+    "tareasCompletadas": {
+
+        "type": "integer",
+
+        "minimum": 0,
+
+        "description": "Cantidad de tareas completadas"
+    },
+
+    "eficiencia": {
+
+        "type": "number",
+
+        "minimum": 0,
+
+        "maximum": 100,
+
+        "description": "Porcentaje de eficiencia del sistema"
+    },
+
+    "activo": {
+
+        "type": "boolean",
+
+        "description": "Estado del reporte"
+    },
+
+    "metricas": {
+
+        "type": "object",
+
+        "description": "Métricas adicionales del sistema",
+
+        "properties": {
+
+            "usuarios_activos": {
+
+                "type": "integer",
+
+                "minimum": 0
+            },
+
+            "usuarios_inactivos": {
+
+                "type": "integer",
+
+                "minimum": 0
+            },
+
+            "tareas_pendientes": {
+
+                "type": "integer",
+
+                "minimum": 0
+            },
+
+            "tareas_vencidas": {
+
+                "type": "integer",
+
+                "minimum": 0
+            },
+
+            "eventos_agenda": {
+
+                "type": "integer",
+
+                "minimum": 0
+            },
+
+            "prioridad_alta": {
+
+                "type": "integer",
+
+                "minimum": 0
+            }
+        }
+    },
+
+    "fechaActualizacion": {
+
+        "type": "string",
+
+        "format": "date-time",
+
+        "description": "Fecha automática de actualización"
+    }
+},
+
+"required": [
+
+    "reporteId",
+
+    "nombreReporte",
+
+    "totalUsuarios",
+
+    "totalTareas",
+
+    "tareasCompletadas",
+
+    "eficiencia",
+
+    "activo"
+]
+
+}

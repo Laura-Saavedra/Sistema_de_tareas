@@ -1,0 +1,19 @@
+{% extends 'reportes/base.html' %}
+
+{% block contenido %}
+
+<h2>Editar Reporte</h2>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">
+        Actualizar Reporte
+    </button>
+
+</form>
+
+{% endblock %}

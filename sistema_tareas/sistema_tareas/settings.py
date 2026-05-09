@@ -80,11 +80,13 @@ WSGI_APPLICATION = 'sistema_tareas.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django',
-        'NAME': 'sistema_tareas_db',
+        'ENGINE': 'djongo',
+        'NAME': 'sistema_tareas',
+        'CLIENT': {
+            'host': 'mongodb://localhost:27017',
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
