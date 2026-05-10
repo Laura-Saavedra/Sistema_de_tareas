@@ -1,0 +1,48 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agendas</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Lista de Agendas</h1>
+        <a href="{% url 'buscar_usuario' %}" class="boton">+ Nueva Agenda</a>
+
+        {% if agendas %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Prioridad</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agenda in agendas %}
+                    <tr>
+                        <td>{{ agenda.titulo }}</td>
+                        <td>{{ agenda.fecha }}</td>
+                        <td>{{ agenda.hora }}</td>
+                        <td>{{ agenda.prioridad }}</td>
+                        <td>{{ agenda.estado }}</td>
+                        <td>
+                            <a href="{% url 'detalle_agenda' agenda.id %}">Ver</a>
+                            <a href="{% url 'editar_agenda' agenda.id %}">Editar</a>
+                            <a href="{% url 'eliminar_agenda' agenda.id %}">Eliminar</a>
+                            <a href="{% url 'agendas_pendientes' %}" class="boton">Ver Pendientes</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay agendas registradas.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

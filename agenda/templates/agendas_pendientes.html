@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Agendas Pendientes</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Actividades Pendientes</h1>
+        <a href="{% url 'listar_agendas' %}">Volver a todas las agendas</a>
+
+        {% if agendas %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Prioridad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for agenda in agendas %}
+                    <tr>
+                        <td>{{ agenda.titulo }}</td>
+                        <td>{{ agenda.fecha }}</td>
+                        <td>{{ agenda.hora }}</td>
+                        <td>{{ agenda.prioridad }}</td>
+                        <td>
+                            <a href="{% url 'detalle_agenda' agenda.id %}">Ver</a>
+                            <a href="{% url 'editar_agenda' agenda.id %}">Editar</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay actividades pendientes.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

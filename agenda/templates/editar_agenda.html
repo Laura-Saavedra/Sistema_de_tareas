@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Agenda</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Editar: {{ agenda.titulo }}</h1>
+        <form method="POST">
+            {% csrf_token %}
+            <p>
+                <label>Título</label><br>
+                {{ formulario.titulo }}
+            </p>
+            <p>
+                <label>Descripción</label><br>
+                {{ formulario.descripcion }}
+            </p>
+            <p>
+                <label>Fecha</label><br>
+                {{ formulario.fecha }}
+            </p>
+            <p>
+                <label>Hora</label><br>
+                {{ formulario.hora }}
+            </p>
+            <p>
+                <label>Prioridad</label><br>
+                {{ formulario.prioridad }}
+            </p>
+            <p>
+                <label>Estado</label><br>
+                {{ formulario.estado }}
+            </p>
+            <p>
+                <label>Recordatorio activo</label>
+                {{ formulario.recordatorioActivo }}
+            </p>
+            <p>
+                <label>ID de Tarea (opcional)</label><br>
+                {{ formulario.tareaId }}
+            </p>
+            <p>
+                <label>ID de Usuario (opcional)</label><br>
+                {{ formulario.usuarioId }}
+            </p>
+            {% if formulario.errors %}
+                <div class="errores">
+                    {{ formulario.errors }}
+                </div>
+            {% endif %}
+            <button type="submit">Guardar cambios</button>
+            <a href="{% url 'listar_agendas' %}">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

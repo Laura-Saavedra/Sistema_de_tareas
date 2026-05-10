@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalle de Agenda</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>{{ agenda.titulo }}</h1>
+        <p><strong>Descripción:</strong> {{ agenda.descripcion }}</p>
+        <p><strong>Fecha:</strong> {{ agenda.fecha }}</p>
+        <p><strong>Hora:</strong> {{ agenda.hora }}</p>
+        <p><strong>Prioridad:</strong> {{ agenda.prioridad }}</p>
+        <p><strong>Estado:</strong> {{ agenda.estado }}</p>
+        <p><strong>Recordatorio activo:</strong>
+            {% if agenda.recordatorioActivo %}
+                Sí
+            {% else %}
+                No
+            {% endif %}
+        </p>
+        <p><strong>Creado el:</strong> {{ agenda.createdAt }}</p>
+
+        {% if agenda.tareaId %}
+            <p><strong>Tarea asociada:</strong>
+                {% if tarea %}
+                    {{ tarea }}
+                {% else %}
+                    ID {{ agenda.tareaId }} (no disponible aún)
+                {% endif %}
+            </p>
+        {% endif %}
+
+        {% if agenda.usuarioId %}
+            <p><strong>Usuario asociado:</strong>
+                {% if usuario %}
+                    {{ usuario }}
+                {% else %}
+                    ID {{ agenda.usuarioId }} (no disponible aún)
+                {% endif %}
+            </p>
+        {% endif %}
+
+        <a href="{% url 'editar_agenda' agenda.id %}" class="boton">Editar</a>
+        <a href="{% url 'eliminar_agenda' agenda.id %}" class="boton-rojo">Eliminar</a>
+        <a href="{% url 'listar_agendas' %}">Volver a la lista</a>
+    </div>
+</body>
+</html>
