@@ -1,0 +1,33 @@
+{% load static %}
+<h1>Lista de Usuarios</h1>
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<table border="1">
+
+    <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Correo</th>
+        <th>Telefono</th>
+        <th>Ciudad</th>
+        <th>Pais</th>
+        <th>Activo</th>
+    </tr>
+
+    {% for usuario in usuarios %}
+
+    <tr>
+        <td>{{ usuario.id }}</td>
+        <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.apellido }}</td>
+        <td>{{ usuario.correo }}</td>
+        <td>{{ usuario.telefono }}</td>
+        <td>{{ usuario.ciudad }}</td>
+        <td>{{ usuario.pais }}</td>
+        <td>{{ usuario.activo }}</td>
+    </tr>
+
+    {% endfor %}
+
+</table>

@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sistema Usuarios</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+    <nav>
+        <a href="/login/">Login</a>
+        <a href="/crear-usuario/">Crear usuario</a>
+        <a href="/usuarios/">Usuarios</a>
+    </nav>
+
+    <hr>
+
+    {% block content %}
+    {% endblock %}
+
+</body>
+</html>
