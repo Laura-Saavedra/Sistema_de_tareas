@@ -1,10 +1,14 @@
 from djongo import models
 
+
 class Usuario(models.Model):
 
+    id = models.ObjectIdField(
+        primary_key=True
+    )
+
     cedula = models.CharField(
-        max_length=20,
-        unique=True
+        max_length=20
     )
 
     nombre = models.CharField(
