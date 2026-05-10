@@ -1,4 +1,6 @@
+{% load static %}
 <form method="POST">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
     {% csrf_token %}
 
     <input type="text" name="nombre" placeholder="Nombre">
