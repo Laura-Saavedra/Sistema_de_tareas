@@ -1,8 +1,9 @@
 import json
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from .models import Usuario
+from django.views.generic import ListView
 
 
 def obtener_usuarios(request):
@@ -13,6 +14,7 @@ def obtener_usuarios(request):
     for usuario in usuarios:
 
         data.append({
+            "cedula": usuario.cedula,
             "id": usuario.id,
             "nombre": usuario.nombre,
             "correo": usuario.correo,
@@ -31,6 +33,7 @@ def crear_usuario(request):
 
             nombre = request.POST.get('nombre')
             apellido = request.POST.get('apellido')
+            cedula = request.POST.get('cedula')
             correo = request.POST.get('correo')
             password = request.POST.get('password')
             telefono = request.POST.get('telefono')
@@ -38,8 +41,10 @@ def crear_usuario(request):
             ciudad = request.POST.get('ciudad')
             pais = request.POST.get('pais')
             edad = request.POST.get('edad')
+            
 
             Usuario.objects.create(
+                cedula=cedula,
                 nombre=nombre,
                 apellido=apellido,
                 correo=correo,
@@ -80,25 +85,28 @@ def login_usuario(request):
 
             if usuario:
 
-                return JsonResponse({
-                    "mensaje": "Login exitoso",
-                    "usuario": {
-                        "id": usuario.id,
-                        "nombre": usuario.nombre,
-                        "correo": usuario.correo
-                    }
-                })
+                return redirect('/dashboard/')
 
             else:
 
-                return JsonResponse({
-                    "error": "Credenciales incorrectas"
-                }, status=401)
+                return render(request, 'login.html', {
+                    'error': 'Credenciales incorrectas'
+                })
 
         except Exception as e:
 
-            return JsonResponse({
-                "error": str(e)
-            }, status=500)
+            return render(request, 'login.html', {
+                'error': str(e)
+            })
 
     return render(request, 'login.html')
+
+def dashboard(request):
+
+    return render(request, 'dashboard.html')
+
+class ListaUsuariosView(ListView):
+
+    model = Usuario
+    template_name = 'lista-usuarios.html'
+    context_object_name = 'usuarios'
