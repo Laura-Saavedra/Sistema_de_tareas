@@ -21,7 +21,6 @@ def obtener_usuarios(request):
             "edad": usuario.edad,
             "activo": usuario.activo
         })
-
     return JsonResponse(data, safe=False)
 
 
@@ -89,18 +88,17 @@ def login_usuario(request):
 
             else:
 
-                return render(request, 'login.html', {
-                    'error': 'Credenciales incorrectas'
-                })
+                return JsonResponse({
+                    "error": "Credenciales incorrectas"
+                }, status=401)
 
         except Exception as e:
 
-            return render(request, 'login.html', {
-                'error': str(e)
-            })
+            return JsonResponse({
+                "error": str(e)
+            }, status=500)
 
     return render(request, 'login.html')
-
 def dashboard(request):
 
     return render(request, 'dashboard.html')
