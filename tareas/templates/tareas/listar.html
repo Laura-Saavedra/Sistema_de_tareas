@@ -1,0 +1,84 @@
+{% load static %}
+
+<h1>Lista de tareas</h1>
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<a href="/tareas/crear/">
+
+    Crear tarea
+
+</a>
+
+<br><br>
+
+<table border="1">
+
+    <tr>
+
+        <th>Titulo</th>
+        <th>Estado</th>
+        <th>Prioridad</th>
+        <th>Fecha entrega</th>
+        <th>Acciones</th>
+
+    </tr>
+
+    {% for tarea in tareas %}
+
+        <tr>
+
+            <td>
+
+                {{ tarea.titulo }}
+
+            </td>
+
+            <td>
+
+                {{ tarea.estadoTarea }}
+
+            </td>
+
+            <td>
+
+                {{ tarea.prioridad }}
+
+            </td>
+
+            <td>
+
+                {{ tarea.fechaEntrega }}
+
+            </td>
+
+            <td>
+
+                <a href="/tareas/detalle/{{ tarea.id }}/">
+
+                    Ver
+
+                </a>
+
+                |
+
+                <a href="/tareas/editar/{{ tarea.id }}/">
+
+                    Editar
+
+                </a>
+
+                |
+
+                <a href="/tareas/eliminar/{{ tarea.id }}/">
+
+                    Eliminar
+
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+</table>
