@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
-
 from django.views.generic import ListView
 from django.views.generic import CreateView
-
-
 from django.urls import reverse_lazy
 from .models import Reporte
 from .forms import ReporteForm
+from usuarios.models import Usuario
+from tareas.models import Tarea
+from agenda.models import Agenda
 
 # Vista basada en clase para listar reportes
 class ListaReportesView(ListView):
@@ -42,16 +42,35 @@ class CrearReporteView(CreateView):
     success_url = reverse_lazy('lista_reportes')
 
 
-def generar_reporte(request):
-    """
-    Vista preparada para futura integración
-    con Usuarios, Tareas y Agenda.
-    """
+def generacion_automatica(request):
+
+    usuarios = Usuario.objects.all()
+
+    reporte = []
+
+    for usuario in usuarios:
+
+        tareas = Tarea.objects.filter(
+            usuarioResponsableId=usuario.id
+        )
+
+        agendas = Agenda.objects.filter(
+            usuarioId=str(usuario.id)
+        )
+
+        reporte.append({
+
+            'usuario': usuario,
+            'cantidad_tareas': tareas.count(),
+            'cantidad_agendas': agendas.count(),
+            'tareas': tareas,
+            'agendas': agendas
+        })
 
     contexto = {
 
-        'mensaje':
-        'Pendiente integración con otras aplicaciones'
+        'mensaje': 'Reporte generado automáticamente',
+        'reporte': reporte
     }
 
     return render(
@@ -59,6 +78,7 @@ def generar_reporte(request):
         'reportes/generar.html',
         contexto
     )
+
 def editar_reporte(request, reporte_id):
     """
     Edita un reporte existente

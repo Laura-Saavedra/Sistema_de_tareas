@@ -22,9 +22,10 @@ urlpatterns = [
 
     path(
         'generar/',
-        views.generar_reporte,
+        views.generacion_automatica,
         name='generar_reporte'
     ),
+
 
     path(
         '<str:reporte_id>/',

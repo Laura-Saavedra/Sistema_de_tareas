@@ -78,13 +78,11 @@ WSGI_APPLICATION = 'sistema_tareas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'sistema_tareas',
-        'CLIENT': {
-            'host': 'mongodb://localhost:27017',
-        }
+        'NAME': 'sistema_tareas_db',
     }
 }
 
