@@ -1,8 +1,12 @@
 from django.shortcuts import render, redirect
 from .models import Tarea
 from usuarios.services import obtenerUsuarios
+from django.views.generic import ListView
+
 
 def crearTarea(request):
+
+    usuarios = obtenerUsuarios()
 
     if request.method == 'POST':
 
@@ -32,16 +36,9 @@ def crearTarea(request):
 
         return redirect('/tareas/listar/')
 
-    return render(request, 'tareas/crear.html')
+    return render(request, 'tareas/crear.html', {
 
-
-def listarTareas(request):
-
-    tareas = Tarea.objects.all()
-
-    return render(request, 'tareas/listar.html', {
-
-        'tareas': tareas
+        'usuarios': usuarios
     })
 
 def editarTarea(request, tareaId):
@@ -74,6 +71,7 @@ def editarTarea(request, tareaId):
         'usuarios': usuarios
     })
 
+
 def eliminarTarea(request, tareaId):
 
     tarea = Tarea.objects.get(id=tareaId)
@@ -81,6 +79,7 @@ def eliminarTarea(request, tareaId):
     tarea.delete()
 
     return redirect('/tareas/listar/')
+
 
 def detalleTarea(request, tareaId):
 

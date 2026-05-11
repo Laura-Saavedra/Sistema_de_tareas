@@ -1,6 +1,7 @@
 {% load static %}
 
 <h1>Editar tarea</h1>
+
 <link rel="stylesheet" href="{% static 'style.css' %}">
 
 <form method="POST">
@@ -27,22 +28,25 @@
 
     <select name="estadoTarea">
 
-        <option value="pendiente">
-
+        <option
+            value="pendiente"
+            {% if tarea.estadoTarea == 'pendiente' %}selected{% endif %}
+        >
             Pendiente
-
         </option>
 
-        <option value="enProceso">
-
+        <option
+            value="enProceso"
+            {% if tarea.estadoTarea == 'enProceso' %}selected{% endif %}
+        >
             En proceso
-
         </option>
 
-        <option value="completada">
-
+        <option
+            value="completada"
+            {% if tarea.estadoTarea == 'completada' %}selected{% endif %}
+        >
             Completada
-
         </option>
 
     </select>
@@ -53,22 +57,25 @@
 
     <select name="prioridad">
 
-        <option value="baja">
-
+        <option
+            value="baja"
+            {% if tarea.prioridad == 'baja' %}selected{% endif %}
+        >
             Baja
-
         </option>
 
-        <option value="media">
-
+        <option
+            value="media"
+            {% if tarea.prioridad == 'media' %}selected{% endif %}
+        >
             Media
-
         </option>
 
-        <option value="alta">
-
+        <option
+            value="alta"
+            {% if tarea.prioridad == 'alta' %}selected{% endif %}
+        >
             Alta
-
         </option>
 
     </select>
@@ -91,7 +98,10 @@
 
         {% for usuario in usuarios %}
 
-            <option value="{{ usuario.id }}">
+            <option
+                value="{{ usuario.cedula }}"
+                {% if tarea.usuarioResponsableId == usuario.cedula %}selected{% endif %}
+            >
 
                 {{ usuario.nombreCompleto }}
 

@@ -1,14 +1,18 @@
 {% load static %}
 
-<h1>Crear tarea</h1>
 <link rel="stylesheet" href="{% static 'style.css' %}">
+
+<h1>Crear tarea</h1>
 
 <form method="POST">
 
     {% csrf_token %}
 
     <label>Titulo</label>
-    <input type="text" name="titulo">
+
+    <input
+        type="text"
+        name="titulo">
 
     <br><br>
 
@@ -60,17 +64,26 @@
 
     <label>Fecha entrega</label>
 
-    <input type="date" name="fechaEntrega">
+    <input
+        type="date"
+        name="fechaEntrega">
 
     <br><br>
 
-    <label>Usuario responsable</label>
+    <label>Usuario Responsable</label>
 
-    <label>Usuario Responsable ID</label>
+    <select name="usuarioResponsableId">
 
-    <input
-        type="number"
-        name="usuarioResponsableId">
+        {% for usuario in usuarios %}
+
+            <option value="{{ usuario.cedula }}">
+
+                {{ usuario.nombreCompleto }}
+
+            </option>
+
+        {% endfor %}
+
     </select>
 
     <br><br>
