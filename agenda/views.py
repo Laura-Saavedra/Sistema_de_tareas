@@ -3,12 +3,18 @@ from django.http import HttpResponse
 from .models import Agenda
 from .forms import AgendaForm, BuscarUsuarioForm
 from . import services
+from django.views import View
 
-
-def listarAgendas(request):
-    agendas = Agenda.objects.all()
-    return render(request, 'listar_agendas.html', {'agendas': agendas})
-
+class ListarAgendasView(View):
+    def get(self, request):
+        cedula = request.session.get('cedula')
+        if not cedula:
+            return redirect('/usuarios/login/')
+        agendas = Agenda.objects.filter(usuarioId=str(cedula))
+        return render(request, 'listar_agendas.html', {
+            'agendas': agendas,
+            'cedula': cedula
+        })
 
 def agendarPendientes(request):
     agendas = Agenda.objects.filter(estado='pendiente').order_by('fecha')
@@ -34,9 +40,9 @@ def buscarUsuario(request):
 
 def crearAgenda(request):
     tareaId = request.GET.get('tareaId') or request.POST.get('tareaId')
-    usuarioId = request.GET.get('usuarioId') or request.POST.get('usuarioId')
+    cedula = request.GET.get('cedula') or request.POST.get('cedula')
 
-    if not tareaId or not usuarioId:
+    if not tareaId or not cedula:
         return redirect('buscar_usuario')
 
     tarea = services.obtenerTarea(tareaId)

@@ -1,0 +1,57 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+
+{% block contenido %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<div class="card detalle">
+
+    <h2>{{ reporte.nombreReporte }}</h2>
+
+    <p>
+        <strong>ID:</strong>
+        {{ reporte.reporteId }}
+    </p>
+
+    <p>
+        <strong>Descripción:</strong>
+        {{ reporte.descripcion }}
+    </p>
+
+    <p>
+        <strong>Total usuarios:</strong>
+        {{ reporte.totalUsuarios }}
+    </p>
+
+    <p>
+        <strong>Total tareas:</strong>
+        {{ reporte.totalTareas }}
+    </p>
+
+    <p>
+        <strong>Tareas completadas:</strong>
+        {{ reporte.tareasCompletadas }}
+    </p>
+
+    <p>
+        <strong>Eficiencia:</strong>
+        {{ reporte.eficiencia }}%
+    </p>
+
+    <p>
+        <strong>Activo:</strong>
+        {{ reporte.activo }}
+    </p>
+
+    <a class="btn btn-warning"
+       href="{% url 'editar_reporte' reporte.reporteId %}">
+        Editar
+    </a>
+
+    <a class="btn btn-danger"
+       href="{% url 'eliminar_reporte' reporte.reporteId %}">
+        Eliminar
+    </a>
+
+</div>
+
+{% endblock %}

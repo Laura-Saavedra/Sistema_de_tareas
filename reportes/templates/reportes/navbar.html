@@ -1,0 +1,13 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<a href="{% url 'lista_reportes' %}">
+    Inicio
+</a>
+
+<a href="{% url 'crear_reporte' %}">
+    Crear Reporte
+</a>
+
+<a href="{% url 'generar_reporte' %}">
+    Generar Automático
+</a>

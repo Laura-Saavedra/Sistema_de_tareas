@@ -1,0 +1,35 @@
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<h1>Dashboard</h1>
+
+<hr>
+
+<h2>📅 Agenda</h2>
+
+<a href="{% url 'crear_agenda' %}">Crear agenda</a>
+<a href="{% url 'listar_agendas' %}">Ver agendas</a><br>
+
+<hr>
+
+<h2>📝 Tareas</h2>
+
+<a href="{% url 'listarTareas' %}">Ver tareas</a><br>
+<a href="{% url 'crearTareas' %}">Crear tarea</a>
+
+<hr>
+
+<h2>📊 Reportes</h2>
+
+<a href="{% url 'lista_reportes' %}">Ver reportes</a><br>
+<a href="{% url 'crear_reporte' %}">Crear reporte</a><br>
+<a href="{% url 'generar_reporte' %}">Generar reporte</a>
+
+<hr>
+
+<h2>👤 Usuario</h2>
+
+<a href="{% url 'listarUsuarios' %}">Ver usuarios</a><br>
+
+{# <a href="{% url 'logout' %}">Cerrar sesión</a> #}

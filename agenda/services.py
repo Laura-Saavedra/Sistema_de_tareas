@@ -1,7 +1,7 @@
-def obtenerTareasPorUsuario(usuarioId):
+def obtenerTareasPorUsuario(cedula):
     try:
         from tareas.models import Tarea
-        return list(Tarea.objects.filter(usuarioId=usuarioId))
+        return list(Tarea.objects.filter(usuarioResponsableId=int(cedula)))
     except Exception:
         return []
 

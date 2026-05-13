@@ -25,9 +25,9 @@
                     <tr>
                         <td>{{ tarea.titulo }}</td>
                         <td>{{ tarea.descripcion }}</td>
-                        <td>{{ tarea.estado }}</td>
+                        <td>{{ tarea.estadoTarea }}</td>
                         <td>
-                            <a href="{% url 'crear_agenda' %}?tareaId={{ tarea.id }}&usuarioId={{ usuarioId }}" class="boton">
+                            <a href="{% url 'crear_agenda' %}?tareaId={{ tarea.id }}&cedula={{ cedula }}" class="boton">
                                 Agendar
                             </a>
                         </td>

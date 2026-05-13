@@ -1,0 +1,20 @@
+{% load static %}
+<form method="POST">
+    {% csrf_token %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <input type="text" name="nombre" placeholder="Nombre">
+
+    <input type="text" name="apellido" placeholder="Apellido">
+    
+    <input type="text" name="cedula" placeholder="Cedula">
+
+    <input type="email" name="correo" placeholder="Correo">
+
+    <input type="password" name="password" placeholder="Contraseña">
+
+
+    <button type="submit">
+        Guardar
+    </button>
+</form>

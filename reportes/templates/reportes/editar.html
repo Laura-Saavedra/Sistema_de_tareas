@@ -1,0 +1,27 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<h2>Editar Reporte</h2>
+
+<p>
+    Última actualización:
+    {{ reporte.fechaActualizacion }}
+</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">
+        Actualizar Reporte
+    </button>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+
+<body>
+
+    <h1>Iniciar Sesión</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input 
+            type="email"
+            name="correo"
+            placeholder="Correo"
+            required
+        >
+
+        <br><br>
+
+        <input 
+            type="password"
+            name="password"
+            placeholder="Contraseña"
+            required
+        >
+
+        <br><br>
+
+        <a href="/usuarios/dashboard/" class="boton">Ingresar</a>
+
+    </form>
+
+    <br><br>
+
+    <a href="/usuarios/crear-usuario/">
+        Crear usuario
+    </a>
+
+</body>
+
+</html>
