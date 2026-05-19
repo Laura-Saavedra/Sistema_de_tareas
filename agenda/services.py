@@ -1,23 +1,23 @@
 def obtenerTareasPorUsuario(correo):
     try:
-        from tareas.models import Tarea
-        return list(Tarea.objects.filter(usuarioCorreo=correo))
+        from tareas.services import obtenerTareasPorUsuario as getTareas
+        return getTareas(correo)
     except Exception:
         return []
 
 
 def obtenerTarea(tareaId):
     try:
-        from tareas.models import Tarea
-        return Tarea.objects.get(id=tareaId)
+        from tareas.services import obtenerTarea as getTarea
+        return getTarea(tareaId)
     except Exception:
         return None
 
 
 def obtenerUsuario(correo):
     try:
-        from usuarios.models import Usuario
-        return Usuario.objects.get(correo=correo)
+        from usuarios.services import obtenerUsuario as getUsuario
+        return getUsuario(correo)
     except Exception:
         return None
 

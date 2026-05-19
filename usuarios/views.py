@@ -4,6 +4,9 @@ from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from .models import Usuario
 from django.views.generic import ListView
+from django.contrib.auth.hashers import make_password
+import traceback
+from django.contrib.auth.hashers import check_password
 
 
 def obtenerUsuarios(request):
@@ -17,68 +20,165 @@ def obtenerUsuarios(request):
     return JsonResponse(data, safe=False)
 
 
+
+
+
 def crearUsuario(request):
+
     if request.method == 'POST':
+
         nombre = request.POST.get('nombre')
         apellido = request.POST.get('apellido')
         correo = request.POST.get('correo')
         password = request.POST.get('password')
 
+        print('datos recibidos:', nombre, apellido, correo, password)
+
+        # Validaciones
         if not nombre:
-            return render(request, 'usuarios.html', {'error': 'El nombre es obligatorio'})
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': 'El nombre es obligatorio'
+                }
+            )
 
         if not apellido:
-            return render(request, 'usuarios.html', {'error': 'El apellido es obligatorio'})
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': 'El apellido es obligatorio'
+                }
+            )
 
         if not correo:
-            return render(request, 'usuarios.html', {'error': 'El correo es obligatorio'})
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': 'El correo es obligatorio'
+                }
+            )
 
         if not password:
-            return render(request, 'usuarios.html', {'error': 'La contraseña es obligatoria'})
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': 'La contraseña es obligatoria'
+                }
+            )
 
-        usuarioExiste = Usuario.objects.filter(correo=correo).first()
+        
+        usuarioExiste = Usuario.objects.filter(
+            correo=correo
+        ).first()
 
         if usuarioExiste:
-            return render(request, 'usuarios.html', {'error': 'El correo ya está registrado'})
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': 'El correo ya está registrado'
+                }
+            )
 
         try:
+
+        
+            passwordEncriptado = make_password(password)
+
+    
             Usuario.objects.create(
                 nombre=nombre,
                 apellido=apellido,
                 correo=correo,
-                password=password,
+                password=passwordEncriptado,
             )
+
+        
             request.session['mensaje'] = 'Usuario creado correctamente'
+
             return redirect('/usuarios/login/')
 
         except Exception as e:
-            print('ERROR:', e)
-            return render(request, 'usuarios.html', {'error': 'Ocurrió un error al crear el usuario'})
+
+            print('ERROR COMPLETO:')
+            traceback.print_exc()
+
+            return render(
+                request,
+                'usuarios.html',
+                {
+                    'error': f'Ocurrió un error: {str(e)}'
+                }
+            )
 
     return render(request, 'usuarios.html')
 
 
 def loginUsuario(request):
+
     mensaje = request.session.pop('mensaje', None)
 
     if request.method == "POST":
+
+        correo = request.POST.get("correo")
+        password = request.POST.get("password")
+
         try:
-            correo = request.POST.get("correo")
-            password = request.POST.get("password")
 
-            usuario = Usuario.objects.filter(correo=correo).first()
+            usuario = Usuario.objects.filter(
+                correo=correo
+            ).first()
 
-            if usuario and usuario.password == password:
+            if not usuario:
+                return render(
+                    request,
+                    'login.html',
+                    {
+                        'error': 'Usuario no encontrado'
+                    }
+                )
+
+            if check_password(password, usuario.password):
+
                 request.session['nombre'] = usuario.nombre
                 request.session['correo'] = usuario.correo
+
                 return redirect('/usuarios/dashboard/')
+
             else:
-                return render(request, 'login.html', {'error': 'Credenciales incorrectas'})
+
+                return render(
+                    request,
+                    'login.html',
+                    {
+                        'error': 'Contraseña incorrecta'
+                    }
+                )
 
         except Exception as e:
-            return render(request, 'login.html', {'error': str(e)})
 
-    return render(request, 'login.html', {'mensaje': mensaje})
+            print("ERROR LOGIN:", e)
+
+            return render(
+                request,
+                'login.html',
+                {
+                    'error': 'Ocurrió un error al iniciar sesión'
+                }
+            )
+
+    return render(
+        request,
+        'login.html',
+        {
+            'mensaje': mensaje
+        }
+    )
 
 
 def dashboard(request):
@@ -92,7 +192,7 @@ def logoutUsuario(request):
     return redirect('/usuarios/login/')
 
 
-class perfilUsuarioView(ListView):
+class ListaUsuariosView(ListView):
     model = Usuario
     template_name = 'perfilUsuario.html'
     context_object_name = 'usuarios'
