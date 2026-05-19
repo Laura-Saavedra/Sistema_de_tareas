@@ -3,14 +3,26 @@
 <html lang="es">
 
 <head>
+
     <meta charset="UTF-8">
+
     <title>Login</title>
+
     <link rel="stylesheet" href="{% static 'style.css' %}">
+
 </head>
 
 <body>
 
     <h1>Iniciar Sesión</h1>
+
+    {% if mensaje %}
+        <p>{{ mensaje }}</p>
+    {% endif %}
+
+    {% if error %}
+        <p>{{ error }}</p>
+    {% endif %}
 
     <form method="POST">
 
@@ -34,7 +46,9 @@
 
         <br><br>
 
-        <a href="/usuarios/dashboard/" class="boton">Ingresar</a>
+        <button type="submit">
+            Ingresar
+        </button>
 
     </form>
 

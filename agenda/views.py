@@ -1,49 +1,41 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import Agenda
-from .forms import AgendaForm, BuscarUsuarioForm
-from . import services
 from django.views import View
+from .models import Agenda
+from .forms import AgendaForm
+from . import services
+from datetime import date
+
 
 class ListarAgendasView(View):
     def get(self, request):
-        cedula = request.session.get('cedula')
-        if not cedula:
+        correo = request.session.get('correo')
+        if not correo:
             return redirect('/usuarios/login/')
-        agendas = Agenda.objects.filter(usuarioId=str(cedula))
+        agendas = Agenda.objects.filter(usuarioCorreo=correo).order_by('fecha')
         return render(request, 'listar_agendas.html', {
             'agendas': agendas,
-            'cedula': cedula
+            'hoy': date.today()
         })
 
+
 def agendarPendientes(request):
-    agendas = Agenda.objects.filter(estado='pendiente').order_by('fecha')
+    correo = request.session.get('correo')
+    if not correo:
+        return redirect('/usuarios/login/')
+    agendas = Agenda.objects.filter(usuarioCorreo=correo, estado='pendiente').order_by('fecha')
     return render(request, 'agendas_pendientes.html', {'agendas': agendas})
 
 
-def buscarUsuario(request):
-    if request.method == 'GET':
-        formulario = BuscarUsuarioForm()
-        return render(request, 'buscar_usuario.html', {'formulario': formulario})
-    else:
-        formulario = BuscarUsuarioForm(request.POST)
-        if formulario.is_valid():
-            usuarioId = formulario.cleaned_data['usuarioId']
-            tareas = services.obtenerTareasPorUsuario(usuarioId)
-            return render(request, 'seleccionar_tarea.html', {
-                'tareas': tareas,
-                'usuarioId': usuarioId,
-                'formulario': formulario,
-            })
-        return render(request, 'buscar_usuario.html', {'formulario': formulario})
-
-
 def crearAgenda(request):
-    tareaId = request.GET.get('tareaId') or request.POST.get('tareaId')
-    cedula = request.GET.get('cedula') or request.POST.get('cedula')
+    correo = request.session.get('correo')
+    if not correo:
+        return redirect('/usuarios/login/')
 
-    if not tareaId or not cedula:
-        return redirect('buscar_usuario')
+    tareaId = request.GET.get('tareaId') or request.POST.get('tareaId')
+
+    if not tareaId:
+        return redirect('listarTareas')
 
     tarea = services.obtenerTarea(tareaId)
 
@@ -53,7 +45,6 @@ def crearAgenda(request):
             'formulario': formulario,
             'tarea': tarea,
             'tareaId': tareaId,
-            'usuarioId': usuarioId,
         })
     else:
         formulario = AgendaForm(request.POST)
@@ -67,25 +58,28 @@ def crearAgenda(request):
                 estado=formulario.cleaned_data['estado'],
                 recordatorioActivo=formulario.cleaned_data['recordatorioActivo'],
                 tareaId=tareaId,
-                usuarioId=usuarioId,
+                usuarioCorreo=correo,
             )
             return redirect('listar_agendas')
         return render(request, 'crear_agenda.html', {
             'formulario': formulario,
             'tarea': tarea,
             'tareaId': tareaId,
-            'usuarioId': usuarioId,
         })
 
 
 def detalleAgenda(request, agenda_id):
+    correo = request.session.get('correo')
+    if not correo:
+        return redirect('/usuarios/login/')
+
     try:
         agenda = Agenda.objects.get(id=agenda_id)
     except Agenda.DoesNotExist:
         return HttpResponse("Agenda no encontrada", status=404)
 
     tarea = services.obtenerTarea(agenda.tareaId) if agenda.tareaId else None
-    usuario = services.obtenerUsuario(agenda.usuarioId) if agenda.usuarioId else None
+    usuario = services.obtenerUsuario(agenda.usuarioCorreo) if agenda.usuarioCorreo else None
 
     return render(request, 'detalle_agenda.html', {
         'agenda': agenda,
@@ -95,6 +89,10 @@ def detalleAgenda(request, agenda_id):
 
 
 def editarAgenda(request, agenda_id):
+    correo = request.session.get('correo')
+    if not correo:
+        return redirect('/usuarios/login/')
+
     try:
         agenda = Agenda.objects.get(id=agenda_id)
     except Agenda.DoesNotExist:
@@ -133,6 +131,10 @@ def editarAgenda(request, agenda_id):
 
 
 def eliminarAgenda(request, agenda_id):
+    correo = request.session.get('correo')
+    if not correo:
+        return redirect('/usuarios/login/')
+
     try:
         agenda = Agenda.objects.get(id=agenda_id)
     except Agenda.DoesNotExist:

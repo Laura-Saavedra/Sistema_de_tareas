@@ -1,12 +1,6 @@
 from django import forms
 from .models import Agenda
-
-
-class BuscarUsuarioForm(forms.Form):
-    usuarioId = forms.CharField(
-        label="Cédula del usuario",
-        max_length=100
-    )
+from .validators import validarFecha
 
 
 class AgendaForm(forms.Form):
@@ -14,7 +8,8 @@ class AgendaForm(forms.Form):
     descripcion = forms.CharField(label="Descripción", widget=forms.Textarea)
     fecha = forms.DateField(
         label="Fecha",
-        widget=forms.DateInput(attrs={'type': 'date'})
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        validators=[validarFecha]
     )
     hora = forms.TimeField(
         label="Hora",

@@ -1,0 +1,59 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Editar Usuario</title>
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+</head>
+
+<body>
+
+    <h1>Editar Usuario</h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <input 
+            type="text"
+            name="nombre"
+            value="{{ usuario.nombre }}"
+            placeholder="Nombre"
+        >
+
+        <br><br>
+
+        <input 
+            type="text"
+            name="apellido"
+            value="{{ usuario.apellido }}"
+            placeholder="Apellido"
+        >
+
+        <br><br>
+
+        <input 
+            type="email"
+            name="correo"
+            value="{{ usuario.correo }}"
+            placeholder="Correo"
+        >
+
+        <br><br>
+
+        <button type="submit">
+            Guardar cambios
+        </button>
+
+    </form>
+
+</body>
+
+</html>

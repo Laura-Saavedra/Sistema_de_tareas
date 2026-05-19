@@ -38,14 +38,6 @@
                 <label>Recordatorio activo</label>
                 {{ formulario.recordatorioActivo }}
             </p>
-            <p>
-                <label>ID de Tarea (opcional)</label><br>
-                {{ formulario.tareaId }}
-            </p>
-            <p>
-                <label>ID de Usuario (opcional)</label><br>
-                {{ formulario.usuarioId }}
-            </p>
             {% if formulario.errors %}
                 <div class="errores">
                     {{ formulario.errors }}

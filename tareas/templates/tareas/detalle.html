@@ -1,72 +1,26 @@
 {% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Detalle de Tarea</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Detalle de Tarea</h1>
 
-<h1>Detalle de tarea</h1>
-<link rel="stylesheet" href="{% static 'style.css' %}">
+        <p><strong>Título:</strong> {{ tarea.titulo }}</p>
+        <hr>
+        <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+        <hr>
+        <p><strong>Estado:</strong> {{ tarea.estadoTarea }}</p>
+        <hr>
+        <p><strong>Fecha de creación:</strong> {{ tarea.fechaCreacion }}</p>
 
-<hr>
-
-<h3>Titulo</h3>
-
-<p>
-
-    {{ tarea.titulo }}
-
-</p>
-
-<hr>
-
-<h3>Descripcion</h3>
-
-<p>
-
-    {{ tarea.descripcion }}
-
-</p>
-
-<hr>
-
-<h3>Estado</h3>
-
-<p>
-
-    {{ tarea.estadoTarea }}
-
-</p>
-
-<hr>
-
-<h3>Prioridad</h3>
-
-<p>
-
-    {{ tarea.prioridad }}
-
-</p>
-
-<hr>
-
-<h3>Fecha entrega</h3>
-
-<p>
-
-    {{ tarea.fechaEntrega }}
-
-</p>
-
-<hr>
-
-<h3>ID Usuario Responsable</h3>
-
-<p>
-
-    {{ tarea.usuarioResponsableId }}
-
-</p>
-
-<hr>
-
-<a href="/tareas/listar/">
-
-    Volver
-
-</a>
+        <br>
+        <a href="{% url 'editarTarea' tarea.id %}" class="boton">Editar</a>
+        <a href="{% url 'eliminarTarea' tarea.id %}" class="boton-rojo">Eliminar</a>
+        <a href="{% url 'listarTareas' %}">Volver a mis tareas</a>
+    </div>
+</body>
+</html>

@@ -27,18 +27,21 @@
                         <td>{{ agenda.titulo }}</td>
                         <td>{{ agenda.fecha }}</td>
                         <td>{{ agenda.hora }}</td>
-                        <td>{{ agenda.prioridad }}</td>
+                        <td>{{ agenda.get_prioridad_display }}</td>
                         <td>
-                            <a href="{% url 'detalle_agenda' agenda.id %}">Ver</a>
-                            <a href="{% url 'editar_agenda' agenda.id %}">Editar</a>
+                            <a href="{% url 'detalle_agenda' agenda.id %}" class="boton">Ver</a>
+                            <a href="{% url 'editar_agenda' agenda.id %}" class="boton">Editar</a>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>No hay actividades pendientes.</p>
+            <p>No tienes actividades pendientes.</p>
         {% endif %}
+
+        <br>
+        <a href="/usuarios/dashboard/">Volver al dashboard</a>
     </div>
 </body>
 </html>

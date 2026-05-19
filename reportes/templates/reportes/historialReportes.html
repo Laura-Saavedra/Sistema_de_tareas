@@ -1,0 +1,45 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<h1>Historial de Reportes</h1>
+<p>Últimos 3 reportes generados.</p>
+
+<hr>
+
+{% if historial %}
+
+    {% for r in historial %}
+
+        <div>
+            <h3>Reporte {{ forloop.counter }} — {{ r.fechaGeneracion|date:"d/m/Y g:i A" }}</h3>
+
+            <p><strong>Tareas:</strong>
+                Total: {{ r.totalTareas }} |
+                Pendientes: {{ r.tareasPendientes }} |
+                En proceso: {{ r.tareasEnProceso }} |
+                Completadas: {{ r.tareasCompletadas }}
+            </p>
+
+            <p><strong>Agendas:</strong>
+                Total: {{ r.totalAgendas }} |
+                Completadas: {{ r.agendasCompletadas }} |
+                Canceladas: {{ r.agendasCanceladas }} |
+                Alta prioridad: {{ r.agendasAltaPrioridad }}
+            </p>
+
+            <p><strong>Productividad:</strong> {{ r.productividad }}%</p>
+        </div>
+
+        <hr>
+
+    {% endfor %}
+
+{% else %}
+
+    <p>No hay reportes guardados aún. Genera tu primer reporte.</p>
+
+{% endif %}
+
+<a href="{% url 'generarReporte' %}">+ Generar nuevo reporte</a>
+<br>
+<a href="/usuarios/dashboard/">← Volver al dashboard</a>

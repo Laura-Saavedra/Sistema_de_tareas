@@ -1,0 +1,59 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+<h1>Generar Reporte</h1>
+
+
+<!-- mostrar la alerta -->
+{% if sin_datos %}
+    <div class="alert alert-warning">
+        No hay información disponible en esas fechas.
+    </div>
+{% endif %}
+
+
+<form method="POST">
+    {% csrf_token %}
+    <!--Usuario llena formulario-->
+    {{ form.as_p }}
+    <button type="submit">Generar Reporte</button>
+</form>
+
+<hr>
+
+{% if reporte %}
+
+    <h2>Reporte de: {{ reporte.usuarioCorreo }}</h2>
+    <p>
+        <strong>Período:</strong>
+        {{ reporte.fechaInicio }} al {{ reporte.fechaFin }}
+    </p>
+    
+    <h3>Tareas</h3>
+    <p>Total: <strong>{{ reporte.resumenTareas.total }}</strong></p>
+    <p>Pendientes: <strong>{{ reporte.resumenTareas.pendientes }}</strong></p>
+    <p>En proceso: <strong>{{ reporte.resumenTareas.enProceso }}</strong></p>
+    <p>Completadas: <strong>{{ reporte.resumenTareas.completadas }}</strong></p>
+
+    <hr>
+
+    <h3>Agendas</h3>
+    <p>Total: <strong>{{ reporte.resumenAgendas.total }}</strong></p>
+    <p>Pendientes: <strong>{{ reporte.resumenAgendas.pendientes }}</strong></p>
+    <p>Completadas: <strong>{{ reporte.resumenAgendas.completadas }}</strong></p>
+    <p>Canceladas: <strong>{{ reporte.resumenAgendas.canceladas }}</strong></p>
+    <p>Alta prioridad: <strong>{{ reporte.resumenAgendas.alta }}</strong></p>
+
+    <hr>
+
+    <h3>Cruce de Datos</h3>
+    <p>Tareas agendadas: <strong>{{ reporte.cruce.tareasAgendadas }}</strong></p>
+    <p>Tareas sin agendar: <strong>{{ reporte.cruce.tareasSinAgendar }}</strong></p>
+
+    <hr>
+
+    <p> Reporte guardado en el historial.</p>
+    <a href="{% url 'historialReportes' %}">Ver historial →</a>
+
+{% endif %}
+<a href="/usuarios/dashboard/">← Volver al dashboard</a>

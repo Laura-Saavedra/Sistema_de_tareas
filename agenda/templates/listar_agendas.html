@@ -2,20 +2,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Agendas</title>
+    <title>Mis Agendas</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
 </head>
 <body>
     <div class="contenedor">
-        <h1>Lista de Agendas</h1>
-        <a href="{% url 'buscar_usuario' %}" class="boton">+ Nueva Agenda</a>
+        <h1>Mis Agendas</h1>
+        <a href="{% url 'listarTareas' %}" class="boton">+ Nueva Agenda</a>
+        <a href="{% url 'agendas_pendientes' %}" class="boton">Ver Pendientes</a>
 
         {% if agendas %}
             <table>
                 <thead>
                     <tr>
                         <th>Título</th>
-                        <th>Fecha</th>
+                        <th>Fecha de agenda</th>
                         <th>Hora</th>
                         <th>Prioridad</th>
                         <th>Estado</th>
@@ -28,21 +29,26 @@
                         <td>{{ agenda.titulo }}</td>
                         <td>{{ agenda.fecha }}</td>
                         <td>{{ agenda.hora }}</td>
-                        <td>{{ agenda.prioridad }}</td>
-                        <td>{{ agenda.estado }}</td>
+                        <td>{{ agenda.get_prioridad_display }}</td>
+                        <td>{{ agenda.get_estado_display }}</td>
                         <td>
-                            <a href="{% url 'detalle_agenda' agenda.id %}">Ver</a>
-                            <a href="{% url 'editar_agenda' agenda.id %}">Editar</a>
-                            <a href="{% url 'eliminar_agenda' agenda.id %}">Eliminar</a>
-                            <a href="{% url 'agendas_pendientes' %}" class="boton">Ver Pendientes</a>
+                            <a href="{% url 'detalle_agenda' agenda.id %}" class="boton">Ver</a>
+                            <a href="{% url 'editar_agenda' agenda.id %}" class="boton">Editar</a>
+                            <form method="POST" action="{% url 'eliminar_agenda' agenda.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="boton-rojo" onclick="return confirm('¿Estás seguro de eliminar esta agenda?')">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         {% else %}
-            <p>No hay agendas registradas.</p>
+            <p>No tienes agendas registradas.</p>
         {% endif %}
+
+        <br>
+        <a href="/usuarios/dashboard/">Volver al dashboard</a>
     </div>
 </body>
 </html>

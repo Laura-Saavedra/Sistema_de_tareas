@@ -13,13 +13,13 @@
             <div class="info-tarea">
                 <p><strong>Tarea:</strong> {{ tarea.titulo }}</p>
                 <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+                <p><strong>Estado de la tarea:</strong> {{ tarea.get_estadoTarea_display }}</p>
             </div>
         {% endif %}
 
         <form method="POST">
             {% csrf_token %}
             <input type="hidden" name="tareaId" value="{{ tareaId }}">
-            <input type="hidden" name="usuarioId" value="{{ usuarioId }}">
             <p>
                 <label>Título</label><br>
                 {{ formulario.titulo }}

@@ -1,84 +1,52 @@
 {% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mis Tareas</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Mis Tareas</h1>
+        <a href="{% url 'crearTarea' %}" class="boton">+ Nueva Tarea</a>
 
-<h1>Lista de tareas</h1>
-<link rel="stylesheet" href="{% static 'style.css' %}">
+        {% if tareas %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Estado</th>
+                        <th>Fecha Creación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarea in tareas %}
+                    <tr>
+                        <td>{{ tarea.titulo }}</td>
+                        <td>{{ tarea.descripcion }}</td>
+                        <td>{{ tarea.get_estadoTarea_display }}</td>
+                        <td>{{ tarea.fechaCreacion }}</td>
+                        <td>
+                            <a href="{% url 'detalleTarea' tarea.id %}" class="boton">Ver</a>
+                            <a href="{% url 'editarTarea' tarea.id %}" class="boton">Editar</a>
+                            <a href="{% url 'crear_agenda' %}?tareaId={{ tarea.id }}" class="boton">Agendar</a>
+                            <form method="POST" action="{% url 'eliminarTarea' tarea.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="boton-rojo" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No tienes tareas registradas.</p>
+        {% endif %}
 
-<a href="/tareas/crear/">
-
-    Crear tarea
-
-</a>
-
-<br><br>
-
-<table border="1">
-
-    <tr>
-
-        <th>Titulo</th>
-        <th>Estado</th>
-        <th>Prioridad</th>
-        <th>Fecha entrega</th>
-        <th>Acciones</th>
-
-    </tr>
-
-    {% for tarea in tareas %}
-
-        <tr>
-
-            <td>
-
-                {{ tarea.titulo }}
-
-            </td>
-
-            <td>
-
-                {{ tarea.estadoTarea }}
-
-            </td>
-
-            <td>
-
-                {{ tarea.prioridad }}
-
-            </td>
-
-            <td>
-
-                {{ tarea.fechaEntrega }}
-
-            </td>
-
-            <td>
-
-                <a href="/tareas/detalle/{{ tarea.id }}/">
-
-                    Ver
-
-                </a>
-
-                |
-
-                <a href="/tareas/editar/{{ tarea.id }}/">
-
-                    Editar
-
-                </a>
-
-                |
-
-                <a href="/tareas/eliminar/{{ tarea.id }}/">
-
-                    Eliminar
-
-                </a>
-
-            </td>
-
-        </tr>
-
-    {% endfor %}
-
-</table>
+        <br>
+        <a href="/usuarios/dashboard/">Volver al dashboard</a>
+    </div>
+</body>
+</html>

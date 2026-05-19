@@ -1,20 +1,40 @@
 {% load static %}
-<form method="POST">
-    {% csrf_token %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Usuario</title>
     <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="contenedor">
+        <h1>Crear Usuario</h1>
 
-    <input type="text" name="nombre" placeholder="Nombre">
+        <form method="POST" action="/usuarios/crear-usuario/">
+            {% csrf_token %}
+            <p>
+                <label>Nombre</label><br>
+                <input type="text" name="nombre" placeholder="Nombre">
+            </p>
+            <p>
+                <label>Apellido</label><br>
+                <input type="text" name="apellido" placeholder="Apellido">
+            </p>
+            <p>
+                <label>Correo</label><br>
+                <input type="email" name="correo" placeholder="Correo">
+            </p>
+            <p>
+                <label>Contraseña</label><br>
+                <input type="password" name="password" placeholder="Contraseña">
+            </p>
 
-    <input type="text" name="apellido" placeholder="Apellido">
-    
-    <input type="text" name="cedula" placeholder="Cedula">
+            {% if error %}
+                <div class="errores">{{ error }}</div>
+            {% endif %}
 
-    <input type="email" name="correo" placeholder="Correo">
-
-    <input type="password" name="password" placeholder="Contraseña">
-
-
-    <button type="submit">
-        Guardar
-    </button>
-</form>
+            <button type="submit">Guardar</button>
+            <a href="/usuarios/login/">Cancelar</a>
+        </form>
+    </div>
+</body>
+</html>

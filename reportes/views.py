@@ -1,181 +1,81 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
-from .models import Reporte
-from .forms import ReporteForm
-from usuarios.models import Usuario
-from tareas.models import Tarea
-from agenda.models import Agenda
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.views import View
+from .forms import GenerarReporteForm
+from .services import (
+    obtenerReporteUsuario,
+    guardarReporte,
+    obtenerHistorialReportes
+)
 
-# Vista basada en clase para listar reportes
-class ListaReportesView(ListView):
+def generarReporte(request):
 
-    model = Reporte
+    if not request.session.get('correo'):
+        return redirect('/usuarios/login/')
+    reporte = None
 
-    template_name = 'reportes/lista.html'
-
-    context_object_name = 'reportes'
-
-def detalle_reporte(request, reporte_id):
-    """
-    Muestra el detalle de un reporte
-    """
-
-    reporte = get_object_or_404(
-        Reporte,
-        reporteId=reporte_id
-    )
-
-    return render(request, 'reportes/detalle.html', {
-        'reporte': reporte
-    })
-
-
-class CrearReporteView(CreateView):
-
-    model = Reporte
-    form_class = ReporteForm
-    template_name = 'reportes/crear.html'
-
-    # Redirección después de guardar
-    success_url = reverse_lazy('lista_reportes')
-
-
-def generacion_automatica(request):
-
-    usuarios = Usuario.objects.all()
-
-    reporte = []
-
-    for usuario in usuarios:
-
-        tareas = Tarea.objects.filter(
-            usuarioResponsableId=usuario.id
-        )
-
-        agendas = Agenda.objects.filter(
-            usuarioId=str(usuario.id)
-        )
-
-        reporte.append({
-
-            'usuario': usuario,
-            'cantidad_tareas': tareas.count(),
-            'cantidad_agendas': agendas.count(),
-            'tareas': tareas,
-            'agendas': agendas
-        })
-
-    contexto = {
-
-        'mensaje': 'Reporte generado automáticamente',
-        'reporte': reporte
-    }
-
-    return render(
-        request,
-        'reportes/generar.html',
-        contexto
-    )
-
-def editar_reporte(request, reporte_id):
-    """
-    Edita un reporte existente
-    """
-
-    reporte = get_object_or_404(
-        Reporte,
-        reporteId=reporte_id
-    )
-
+    # Verifica si es formulario fue enviado
     if request.method == 'POST':
-
-        form = ReporteForm(
-            request.POST,
-            instance=reporte
-        )
+        #Crea formularios -- request.POST contiene los inputs del formulario.
+        form = GenerarReporteForm(request.POST)
 
         if form.is_valid():
 
-            form.save()
-
-            return redirect(
-                'detalle_reporte',
-                reporte_id=reporte.reporteId
+            usuarioCorreo = request.session.get('correo')
+            fechaInicio = form.cleaned_data['fechaInicio']
+            fechaFin = form.cleaned_data['fechaFin']
+            #Llama la función que genera el reporte.
+            reporte = obtenerReporteUsuario(
+                usuarioCorreo,
+                fechaInicio,
+                fechaFin
             )
 
-    else:
+            if (
+                reporte['resumenTareas']['total'] == 0 and
+                reporte['resumenAgendas']['total'] == 0
+            ):
+                return render(request, 'reportes/reporteUsuario.html', {
+                    'form': form,
+                    'reporte': None,
+                    'sin_datos': True
+                })
+            else:
+                # Guardar solo si hay datos
+                guardarReporte(
+                    usuarioCorreo=usuarioCorreo,
+                    resumenTareas=reporte['resumenTareas'],
+                    resumenAgendas=reporte['resumenAgendas'],
+                    cruce=reporte['cruce']
+                )
 
-        form = ReporteForm(instance=reporte)
+    else:
+        form = GenerarReporteForm()
 
     return render(
         request,
-        'reportes/editar.html',
+        'reportes/reporteUsuario.html',
         {
             'form': form,
             'reporte': reporte
         }
     )
 
-def eliminar_reporte(request, reporte_id):
-    """
-    Elimina un reporte
-    """
+class HistorialReportesView(View):
+    #Obtener el historial de reportes del usuario que actualmente tiene la sesión iniciada
+    def get(self, request):
 
-    reporte = get_object_or_404(
-        Reporte,
-        reporteId=reporte_id
-    )
+        if not request.session.get('correo'):
+            return redirect('/usuarios/login/')
 
-    if request.method == 'POST':
+        usuarioCorreo = request.session.get('correo')
+        #Busca historial de reportes del usuario.
+        historial = obtenerHistorialReportes(usuarioCorreo)
 
-        reporte.delete()
-
-        return redirect('lista_reportes')
-
-    return render(
-        request,
-        'reportes/eliminar.html',
-        {
-            'reporte': reporte
-        }
-    )
-
-"""
-def lista_reportes(request):
-    
-    # Obtiene todos los reportes
-    reportes = Reporte.objects.all()
-
-    return render(request, 'reportes/lista.html', {
-        'reportes': reportes
-    })
-
-
-def crear_reporte(request):
-    
-    # Verifica si el formulario fue enviado
-    if request.method == 'POST':
-
-        # Carga datos del formulario
-        form = ReporteForm(request.POST)
-
-        # Valida los datos
-        if form.is_valid():
-
-            # Guarda el reporte
-            form.save()
-
-            # Redirecciona a la lista
-            return redirect('lista_reportes')
-
-    else:
-
-        # Muestra formulario vacío
-        form = ReporteForm()
-
-    return render(request, 'reportes/crear.html', {
-        'form': form
-    })
-"""
+        return render(
+            request,
+            'reportes/historialReportes.html',
+            {
+                'historial': historial
+            }
+        )

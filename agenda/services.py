@@ -1,7 +1,7 @@
-def obtenerTareasPorUsuario(cedula):
+def obtenerTareasPorUsuario(correo):
     try:
         from tareas.models import Tarea
-        return list(Tarea.objects.filter(usuarioResponsableId=int(cedula)))
+        return list(Tarea.objects.filter(usuarioCorreo=correo))
     except Exception:
         return []
 
@@ -14,9 +14,25 @@ def obtenerTarea(tareaId):
         return None
 
 
-def obtenerUsuario(usuarioId):
+def obtenerUsuario(correo):
     try:
         from usuarios.models import Usuario
-        return Usuario.objects.get(id=usuarioId)
+        return Usuario.objects.get(correo=correo)
     except Exception:
         return None
+
+
+def obtenerAgendasPorUsuario(correo):
+    try:
+        from .models import Agenda
+        return list(Agenda.objects.filter(usuarioCorreo=correo))
+    except Exception:
+        return []
+
+
+def obtenerAgendasPorEstado(estado):
+    try:
+        from .models import Agenda
+        return list(Agenda.objects.filter(estado=estado))
+    except Exception:
+        return []

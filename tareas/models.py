@@ -4,17 +4,9 @@ from djongo import models
 class Tarea(models.Model):
 
     ESTADOS = [
-
         ('pendiente', 'Pendiente'),
         ('enProceso', 'En Proceso'),
         ('completada', 'Completada')
-    ]
-
-    PRIORIDADES = [
-
-        ('baja', 'Baja'),
-        ('media', 'Media'),
-        ('alta', 'Alta')
     ]
 
     titulo = models.CharField(
@@ -29,21 +21,13 @@ class Tarea(models.Model):
         default='pendiente'
     )
 
-    prioridad = models.CharField(
-        max_length=10,
-        choices=PRIORIDADES,
-        default='media'
+    usuarioCorreo = models.CharField(
+        max_length=200
     )
-
-    fechaEntrega = models.DateField()
-
-    usuarioResponsableId = models.IntegerField()
 
     fechaCreacion = models.DateTimeField(
         auto_now_add=True
     )
 
     def __str__(self):
-
         return self.titulo
-        

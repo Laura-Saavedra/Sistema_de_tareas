@@ -8,11 +8,12 @@
 <body>
     <div class="contenedor">
         <h1>{{ agenda.titulo }}</h1>
+
         <p><strong>Descripción:</strong> {{ agenda.descripcion }}</p>
         <p><strong>Fecha:</strong> {{ agenda.fecha }}</p>
         <p><strong>Hora:</strong> {{ agenda.hora }}</p>
-        <p><strong>Prioridad:</strong> {{ agenda.prioridad }}</p>
-        <p><strong>Estado:</strong> {{ agenda.estado }}</p>
+        <p><strong>Prioridad:</strong> {{ agenda.get_prioridad_display }}</p>
+        <p><strong>Estado:</strong> {{ agenda.get_estado_display }}</p>
         <p><strong>Recordatorio activo:</strong>
             {% if agenda.recordatorioActivo %}
                 Sí
@@ -23,27 +24,34 @@
         <p><strong>Creado el:</strong> {{ agenda.createdAt }}</p>
 
         {% if agenda.tareaId %}
-            <p><strong>Tarea asociada:</strong>
+            <div class="info-tarea">
+                <p><strong>Tarea asociada:</strong></p>
                 {% if tarea %}
-                    {{ tarea }}
+                    <p><strong>Título:</strong> {{ tarea.titulo }}</p>
+                    <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
+                    <p><strong>Estado:</strong> {{ tarea.get_estadoTarea_display }}</p>
                 {% else %}
-                    ID {{ agenda.tareaId }} (no disponible aún)
+                    <p>Tarea no disponible aún.</p>
                 {% endif %}
-            </p>
+            </div>
         {% endif %}
 
-        {% if agenda.usuarioId %}
-            <p><strong>Usuario asociado:</strong>
+        {% if agenda.usuarioCorreo %}
+            <p><strong>Usuario:</strong>
                 {% if usuario %}
-                    {{ usuario }}
+                    {{ usuario.nombre }} {{ usuario.apellido }}
                 {% else %}
-                    ID {{ agenda.usuarioId }} (no disponible aún)
+                    {{ agenda.usuarioCorreo }}
                 {% endif %}
             </p>
         {% endif %}
 
+        <br>
         <a href="{% url 'editar_agenda' agenda.id %}" class="boton">Editar</a>
-        <a href="{% url 'eliminar_agenda' agenda.id %}" class="boton-rojo">Eliminar</a>
+        <form method="POST" action="{% url 'eliminar_agenda' agenda.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="boton-rojo" onclick="return confirm('¿Estás seguro de eliminar esta agenda?')">Eliminar</button>
+        </form>
         <a href="{% url 'listar_agendas' %}">Volver a la lista</a>
     </div>
 </body>

@@ -1,34 +1,12 @@
-from django.contrib import admin
 from django.urls import path
-from django.shortcuts import render, redirect
-from usuarios.views import crearUsuario,loginUsuario,dashboard,ListaUsuariosView
+from usuarios.views import crearUsuario, editarUsuario, loginUsuario, dashboard, perfilUsuarioView, logoutUsuario
 
 urlpatterns = [
-
-    path(
-        'admin/',
-        admin.site.urls
-    ),
-
-    path(
-        '',
-        loginUsuario
-    ),
-
-    path(
-        'crear-usuario/',
-        crearUsuario
-    ),
-    path(
-    'login/',
-    loginUsuario
-    ),
-    path(
-    'dashboard/',
-    dashboard
-    ),
-    path(
-    'lista-usuarios/',
-    ListaUsuariosView.as_view(), name='listarUsuarios'
-    ),
+    path('', loginUsuario),
+    path('crear-usuario/', crearUsuario),
+    path('login/', loginUsuario, name='Login'),
+    path('dashboard/', dashboard),
+    path('perfilUsuario/', perfilUsuarioView.as_view(), name='perfilUsuario'),
+    path('logout/', logoutUsuario, name='logout'),
+    path('editar-usuario/', editarUsuario, name='editarUsuario'),
 ]
