@@ -192,7 +192,7 @@ def logoutUsuario(request):
     return redirect('/usuarios/login/')
 
 
-class ListaUsuariosView(ListView):
+class perfilUsuarioView(ListView):
     model = Usuario
     template_name = 'perfilUsuario.html'
     context_object_name = 'usuarios'
