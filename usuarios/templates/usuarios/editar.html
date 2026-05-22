@@ -1,0 +1,44 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block titulo %}Editar Perfil{% endblock %}
+
+{% block content %}
+ <link rel="stylesheet" href="{% static 'style.css' %}">
+<div class="form-card">
+
+    <h1><i class="bi bi-pencil-square"></i> Editar datos</h1>
+
+    {% if errores %}
+        <div class="flash-msg flash-error">
+            {% for e in errores %}<div><i class="bi bi-dot"></i> {{ e }}</div>{% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="campo">
+            <label for="nombre"><i class="bi bi-person"></i> Nombre</label>
+            <input type="text" id="nombre" name="nombre"
+                value="{{ usuario.nombre }}" required>
+        </div>
+
+        <div class="campo">
+            <label for="apellido">Apellido</label>
+            <input type="text" id="apellido" name="apellido"
+                value="{{ usuario.apellido }}" required>
+        </div>
+
+        <div class="acciones">
+            <button type="submit" class="btn-guardar">
+                <i class="bi bi-check2"></i> Guardar cambios
+            </button>
+            <a href="{% url 'perfilUsuario' %}" class="btn-cancelar">
+                <i class="bi bi-x"></i> Cancelar
+            </a>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block titulo %}Mi Perfil{% endblock %}
+{% block content %}
+ <link rel="stylesheet" href="{% static 'style.css' %}">
+<div class="perfil-card">
+
+    {% if error_foto %}
+        <div class="flash-msg flash-error">
+            <i class="bi bi-exclamation-triangle"></i> {{ error_foto }}
+        </div>
+    {% endif %}
+
+    <!-- Encabezado con foto -->
+    <div class="perfil-header">
+
+        <div class="foto-wrap">
+            {% if usuario.foto_perfil %}
+                <img src="{{ MEDIA_URL }}{{ usuario.foto_perfil }}"
+                     alt="Foto de perfil" class="foto-perfil">
+            {% else %}
+                <div class="foto-placeholder">
+                    {{ usuario.nombre|slice:":1"|upper }}
+                </div>
+            {% endif %}
+
+            <!-- Botón que activa el input de archivo -->
+            <label for="input-foto" class="foto-btn" title="Cambiar foto">
+                <i class="bi bi-camera"></i>
+            </label>
+        </div>
+
+        <div class="perfil-info">
+            <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+            <p class="correo"><i class="bi bi-envelope"></i> {{ usuario.correo }}</p>
+            <span class="rol-badge rol-{{ usuario.rol }}">
+                {% if usuario.rol == 'profesor' %}👨‍🏫{% else %}🎓{% endif %}
+                {{ usuario.get_rol_display }}
+            </span>
+        </div>
+
+    </div>
+
+    <!-- Datos del perfil -->
+    <div class="dato-fila">
+        <span class="dato-label"><i class="bi bi-person"></i> Nombre</span>
+        <span class="dato-valor">{{ usuario.nombre }}</span>
+    </div>
+    <div class="dato-fila">
+        <span class="dato-label"><i class="bi bi-person"></i> Apellido</span>
+        <span class="dato-valor">{{ usuario.apellido }}</span>
+    </div>
+    <div class="dato-fila">
+        <span class="dato-label"><i class="bi bi-shield-check"></i> Estado</span>
+        <span class="dato-valor">
+            {% if usuario.verificado %}
+                <span style="color:#388e3c;"><i class="bi bi-check-circle-fill"></i> Verificado</span>
+            {% else %}
+                <span style="color:#e53935;"><i class="bi bi-x-circle-fill"></i> Sin verificar</span>
+            {% endif %}
+        </span>
+    </div>
+    {% if usuario.fecha_registro %}
+    <div class="dato-fila">
+        <span class="dato-label"><i class="bi bi-calendar"></i> Miembro desde</span>
+        <span class="dato-valor">{{ usuario.fecha_registro|date:"d \d\e F \d\e Y"|cut:"UTC" }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Botones de acción -->
+    <div class="acciones-perfil">
+        <a href="{% url 'editarUsuario' %}" class="btn-accion btn-editar">
+            <i class="bi bi-pencil-square"></i> Editar datos
+        </a>
+        <a href="{% url 'cambiarPassword' %}" class="btn-accion btn-password">
+            <i class="bi bi-key"></i> Cambiar contraseña
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn-accion btn-volver" style="grid-column: 1/-1;">
+            <i class="bi bi-arrow-left"></i> Volver al dashboard
+        </a>
+    </div>
+
+</div>
+
+<!-- Form oculto para subir foto -->
+<form id="form-foto" method="POST" action="{% url 'subirFotoPerfil' %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" id="input-foto" name="foto"
+           accept=".jpg,.jpeg,.png,.webp,.gif">
+</form>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Cuando el usuario selecciona una foto, se envía el form automáticamente
+    document.getElementById('input-foto').addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            document.getElementById('form-foto').submit();
+        }
+    });
+</script>
+{% endblock %}

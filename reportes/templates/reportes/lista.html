@@ -1,0 +1,52 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<h2>Lista de Reportes</h2>
+<link rel="stylesheet" href="{% static 'style.css' %}">
+
+{% for reporte in reportes %}
+
+<div class="card">
+
+    <h3>{{ reporte.nombreReporte }}</h3>
+
+    <p>
+        <strong>ID:</strong>
+        {{ reporte.reporteId }}
+    </p>
+
+    <p>
+        <strong>Eficiencia:</strong>
+        {{ reporte.eficiencia }}%
+    </p>
+
+    <a class="btn btn-primary"
+       href="{% url 'detalle_reporte' reporte.reporteId %}">
+        Ver detalle
+    </a>
+
+    <a class="btn btn-warning"
+       href="{% url 'editar_reporte' reporte.reporteId %}">
+        Editar
+    </a>
+
+    <a class="btn btn-danger"
+       href="{% url 'eliminar_reporte' reporte.reporteId %}">
+        Eliminar
+    </a>
+
+</div>
+
+{% empty %}
+
+<div class="card">
+
+    <p>No existen reportes registrados</p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

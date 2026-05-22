@@ -1,0 +1,160 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<link rel="stylesheet" href="{% static 'styles.css' %}">
+
+<h2>Generación Automática de Reportes</h2>
+
+<p>{{ mensaje }}</p>
+
+{% for item in reporte %}
+
+<hr>
+
+<h3>
+    Usuario:
+    {{ item.usuario.nombre }}
+    {{ item.usuario.apellido }}
+</h3>
+
+<p>
+    <strong>Correo:</strong>
+    {{ item.usuario.correo }}
+</p>
+
+<p>
+    <strong>Ciudad:</strong>
+    {{ item.usuario.ciudad }}
+</p>
+
+<p>
+    <strong>Estado del usuario:</strong>
+
+    {% if item.usuario.activo %}
+        Activo
+    {% else %}
+        Inactivo
+    {% endif %}
+</p>
+
+<p>
+    <strong>Fecha de registro:</strong>
+    {{ item.usuario.fechaRegistro }}
+</p>
+
+<p>
+    <strong>Total tareas:</strong>
+    {{ item.cantidad_tareas }}
+</p>
+
+<p>
+    <strong>Total agendas:</strong>
+    {{ item.cantidad_agendas }}
+</p>
+
+<h4>Tareas Asociadas</h4>
+
+<ul>
+
+{% for tarea in item.tareas %}
+
+<li>
+
+    <strong>Título:</strong>
+    {{ tarea.titulo }}
+
+    <br>
+
+    <strong>Estado:</strong>
+    {{ tarea.estadoTarea }}
+
+    <br>
+
+    <strong>Prioridad:</strong>
+    {{ tarea.prioridad }}
+
+    <br>
+
+    <strong>Fecha entrega:</strong>
+    {{ tarea.fechaEntrega }}
+
+    <br>
+
+    <strong>Fecha creación:</strong>
+    {{ tarea.fechaCreacion }}
+
+</li>
+
+<hr>
+
+{% empty %}
+
+<li>No tiene tareas registradas</li>
+
+{% endfor %}
+
+</ul>
+
+<h4>Eventos de Agenda</h4>
+
+<ul>
+
+{% for agenda in item.agendas %}
+
+<li>
+
+    <strong>Título:</strong>
+    {{ agenda.titulo }}
+
+    <br>
+
+    <strong>Estado:</strong>
+    {{ agenda.estado }}
+
+    <br>
+
+    <strong>Prioridad:</strong>
+    {{ agenda.prioridad }}
+
+    <br>
+
+    <strong>Fecha:</strong>
+    {{ agenda.fecha }}
+
+    <br>
+
+    <strong>Hora:</strong>
+    {{ agenda.hora }}
+
+    <br>
+
+    <strong>Recordatorio:</strong>
+
+    {% if agenda.recordatorioActivo %}
+        Activado
+    {% else %}
+        Desactivado
+    {% endif %}
+
+    <br>
+
+    <strong>Fecha creación:</strong>
+    {{ agenda.createdAt }}
+
+</li>
+
+<hr>
+
+{% empty %}
+
+<li>No tiene eventos registrados</li>
+
+{% endfor %}
+
+</ul>
+
+{% endfor %}
+
+{% endblock %}

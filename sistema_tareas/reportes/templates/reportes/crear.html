@@ -1,0 +1,20 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+
+{% block contenido %}
+
+<h2>Crear Reporte</h2>
+ <link rel="stylesheet" href="{% static 'styles.css' %}">
+<form method="POST">
+
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-primary">
+        Guardar Reporte
+    </button>
+
+</form>
+
+{% endblock %}

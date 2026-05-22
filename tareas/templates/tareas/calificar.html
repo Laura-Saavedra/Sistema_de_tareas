@@ -1,0 +1,131 @@
+{% extends "usuarios/base.html" %}
+{% load static %}
+
+{% block titulo %}Calificar: {{ tarea.titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-star"></i> Calificar Tarea</h2>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+
+    <a href="{% url 'detalleTarea' tarea.id %}" class="boton boton-secundario">
+        <i class="bi bi-arrow-left"></i> Volver al detalle
+    </a>
+</div>
+
+<!-- Resumen de la tarea -->
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card-header">
+        <i class="bi bi-file-text"></i> Tarea a calificar
+    </div>
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Título</span>
+                <span><strong>{{ tarea.titulo }}</strong></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="bi bi-person"></i> Estudiante</span>
+                <span>{{ tarea.estudianteCorreo|default:"Sin asignar" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="bi bi-flag"></i> Estado</span>
+                <span class="badge badge-estado-{{ tarea.estadoTarea }}">
+                    {{ tarea.get_estadoTarea_display }}
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label"><i class="bi bi-calendar-event"></i> Fecha entrega</span>
+                <span>{{ tarea.fechaEntrega|default:"—" }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formulario de calificación -->
+<div class="form-card">
+
+    {% if calificacion %}
+    <div class="flash-msg flash-exito" style="margin-bottom: 16px;">
+        <i class="bi bi-info-circle"></i>
+        Esta tarea ya fue calificada con nota <strong>{{ calificacion.nota }}</strong>.
+        Puedes modificarla a continuación.
+    </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        {% if form.errors %}
+        <div class="flash-msg flash-error">
+            <i class="bi bi-exclamation-triangle"></i>
+            Revisa los campos marcados en rojo.
+        </div>
+        {% endif %}
+
+        <div class="form-grid">
+
+            <!-- Nota -->
+            <div class="form-group">
+                <label for="{{ form.nota.id_for_label }}">
+                    <i class="bi bi-123"></i> Nota (0.0 – 5.0) <span class="requerido">*</span>
+                </label>
+                {{ form.nota }}
+                {% if form.nota.errors %}
+                    <span class="field-error">{{ form.nota.errors.0 }}</span>
+                {% endif %}
+                <small class="field-hint">Escala de 0.0 a 5.0, con decimales.</small>
+            </div>
+
+            <!-- Escala visual de referencia -->
+            <div class="form-group">
+                <label><i class="bi bi-bar-chart"></i> Referencia de escala</label>
+                <div class="escala-notas">
+                    <div class="escala-item escala-baja">0.0 – 2.9 · Reprobado</div>
+                    <div class="escala-item escala-media">3.0 – 3.9 · Aceptable</div>
+                    <div class="escala-item escala-alta">4.0 – 4.4 · Bueno</div>
+                    <div class="escala-item escala-excelente">4.5 – 5.0 · Excelente</div>
+                </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="form-group full-width">
+                <label for="{{ form.observaciones.id_for_label }}">
+                    <i class="bi bi-chat-text"></i> Observaciones / Retroalimentación
+                </label>
+                {{ form.observaciones }}
+                {% if form.observaciones.errors %}
+                    <span class="field-error">{{ form.observaciones.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="boton">
+                <i class="bi bi-check-circle"></i>
+                {% if calificacion %}Actualizar calificación{% else %}Guardar calificación{% endif %}
+            </button>
+            <a href="{% url 'detalleTarea' tarea.id %}" class="boton boton-secundario">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+{% block scripts %}
+<style>
+    .escala-notas { display: flex; flex-direction: column; gap: 4px; }
+    .escala-item {
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-size: 0.83rem;
+        font-weight: 500;
+    }
+    .escala-baja      { background: rgba(229,115,115,.18); color: #e57373; }
+    .escala-media     { background: rgba(255,183,77,.18);  color: #ffb74d; }
+    .escala-alta      { background: rgba(79,195,247,.18);  color: #4fc3f7; }
+    .escala-excelente { background: rgba(102,187,106,.18); color: #66bb6a; }
+</style>
+{% endblock %}
+{% endblock %}

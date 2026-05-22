@@ -1,0 +1,55 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block titulo %}Verificar Correo{% endblock %}
+
+{% block content %}
+ <link rel="stylesheet" href="{% static 'style.css' %}">
+<div class="auth-card">
+
+    <div class="icono-email"><i class="bi bi-envelope-check"></i></div>
+    <h1>Verifica tu correo</h1>
+    <p class="subtitulo">
+        Enviamos un código de 6 dígitos a<br>
+        <span class="correo-highlight">{{ correo }}</span>
+    </p>
+
+    {% if error %}
+        <div class="flash-msg flash-error" style="text-align:left;">
+            <i class="bi bi-exclamation-triangle"></i> {{ error }}
+        </div>
+    {% endif %}
+
+    {% if codigo_dev %}
+        <div class="dev-box">
+            🛠️ <strong>Modo desarrollo</strong> — el email no se envió realmente.<br>
+            Tu código es: <strong>{{ codigo_dev }}</strong>
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <input
+            type="text"
+            name="codigo"
+            class="codigo-input"
+            maxlength="6"
+            minlength="6"
+            pattern="\d{6}"
+            placeholder="000000"
+            autofocus
+            required
+        >
+
+        <button type="submit" class="btn-verificar">
+            <i class="bi bi-check2-circle"></i> Verificar cuenta
+        </button>
+    </form>
+
+    <a href="{% url 'reenviar_codigo' %}" class="reenviar-link">
+        <i class="bi bi-arrow-clockwise"></i> No recibí el código — reenviar
+    </a>
+
+</div>
+{% endblock %}

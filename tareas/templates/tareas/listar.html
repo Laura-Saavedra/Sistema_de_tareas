@@ -1,52 +1,176 @@
+{% extends "usuarios/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Mis Tareas</title>
-    <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-    <div class="contenedor">
-        <h1>Mis Tareas</h1>
-        <a href="{% url 'crearTarea' %}" class="boton">+ Nueva Tarea</a>
 
-        {% if tareas %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Descripción</th>
-                        <th>Estado</th>
-                        <th>Fecha Creación</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for tarea in tareas %}
-                    <tr>
-                        <td>{{ tarea.titulo }}</td>
-                        <td>{{ tarea.descripcion }}</td>
-                        <td>{{ tarea.get_estadoTarea_display }}</td>
-                        <td>{{ tarea.fechaCreacion }}</td>
-                        <td>
-                            <a href="{% url 'detalleTarea' tarea.id %}" class="boton">Ver</a>
-                            <a href="{% url 'editarTarea' tarea.id %}" class="boton">Editar</a>
-                            <a href="{% url 'crear_agenda' %}?tareaId={{ tarea.id }}" class="boton">Agendar</a>
-                            <form method="POST" action="{% url 'eliminarTarea' tarea.id %}" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="boton-rojo" onclick="return confirm('¿Estás seguro de eliminar esta tarea?')">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+{% block titulo %}Tareas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>
+        {% if request.session.rol == 'profesor' %}
+            <i class="bi bi-card-checklist"></i> Gestión de Tareas
         {% else %}
-            <p>No tienes tareas registradas.</p>
+            <i class="bi bi-card-checklist"></i> Mis Tareas
         {% endif %}
+    </h2>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
 
-        <br>
-        <a href="/usuarios/dashboard/">Volver al dashboard</a>
+    {% if request.session.rol == 'profesor' %}
+        <a href="{% url 'crearTarea' %}" class="boton">
+            <i class="bi bi-plus-circle"></i> Nueva tarea
+        </a>
+    {% endif %}
+</div>
+
+<!-- Estadísticas rápidas -->
+<div class="stats-row">
+    <div class="stat-card">
+        <i class="bi bi-list-task"></i>
+        <span class="stat-num">{{ estadisticas.total }}</span>
+        <span class="stat-label">Total</span>
     </div>
-</body>
-</html>
+    <div class="stat-card">
+        <i class="bi bi-hourglass-split"></i>
+        <span class="stat-num">{{ estadisticas.pendientes }}</span>
+        <span class="stat-label">Pendientes</span>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-check-circle"></i>
+        <span class="stat-num">{{ estadisticas.completadas }}</span>
+        <span class="stat-label">Completadas</span>
+    </div>
+    {% if request.session.rol == 'estudiante' and estadisticas.promedio %}
+    <div class="stat-card">
+        <i class="bi bi-star"></i>
+        <span class="stat-num">{{ estadisticas.promedio }}</span>
+        <span class="stat-label">Promedio</span>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Filtros -->
+<form method="GET" class="filtros-form">
+    <div class="filtros-grid">
+        <div class="filtro-item">
+            <label><i class="bi bi-search"></i> Buscar</label>
+            <input type="text" name="q" value="{{ filtros.q }}" placeholder="Título de la tarea...">
+        </div>
+        <div class="filtro-item">
+            <label><i class="bi bi-flag"></i> Estado</label>
+            <select name="estado">
+                <option value="">Todos</option>
+                {% for val, label in estados %}
+                    <option value="{{ val }}" {% if filtros.estado == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-item">
+            <label><i class="bi bi-exclamation-triangle"></i> Prioridad</label>
+            <select name="prioridad">
+                <option value="">Todas</option>
+                {% for val, label in prioridades %}
+                    <option value="{{ val }}" {% if filtros.prioridad == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filtro-item">
+            <label><i class="bi bi-calendar-event"></i> Fecha entrega</label>
+            <input type="date" name="fecha" value="{{ filtros.fecha }}">
+        </div>
+        {% if request.session.rol == 'profesor' %}
+        <div class="filtro-item">
+            <label><i class="bi bi-person"></i> Estudiante</label>
+            <select name="usuario">
+                <option value="">Todos</option>
+                {% for est in estudiantes %}
+                    <option value="{{ est.correo }}" {% if filtros.usuario == est.correo %}selected{% endif %}>
+                        {{ est.nombre }} {{ est.apellido }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+    </div>
+    <div class="filtros-actions">
+        <button type="submit" class="boton"><i class="bi bi-funnel"></i> Filtrar</button>
+        <a href="{% url 'listarTareas' %}" class="boton boton-secundario"><i class="bi bi-x-circle"></i> Limpiar</a>
+    </div>
+</form>
+
+<!-- Tabla de tareas -->
+{% if tareas %}
+<div class="tabla-contenedor">
+    <table class="tabla">
+        <thead>
+            <tr>
+                <th>Título</th>
+                {% if request.session.rol == 'profesor' %}
+                    <th>Estudiante</th>
+                {% endif %}
+                <th>Estado</th>
+                <th>Prioridad</th>
+                <th>Fecha entrega</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tarea in tareas %}
+            <tr>
+                <td>
+                    <a href="{% url 'detalleTarea' tarea.id %}" class="link-titulo">
+                        {{ tarea.titulo }}
+                    </a>
+                </td>
+                {% if request.session.rol == 'profesor' %}
+                <td>
+                    {% if tarea.estudianteCorreo %}
+                        <i class="bi bi-person-fill"></i> {{ tarea.estudianteCorreo }}
+                    {% else %}
+                        <span class="texto-gris">Sin asignar</span>
+                    {% endif %}
+                </td>
+                {% endif %}
+                <td>
+                    <span class="badge badge-estado-{{ tarea.estadoTarea }}">
+                        {{ tarea.get_estadoTarea_display }}
+                    </span>
+                </td>
+                <td>
+                    <span class="badge badge-prioridad-{{ tarea.prioridad }}">
+                        {{ tarea.get_prioridad_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if tarea.fechaEntrega %}
+                        <i class="bi bi-calendar3"></i> {{ tarea.fechaEntrega }}
+                    {% else %}
+                        <span class="texto-gris">—</span>
+                    {% endif %}
+                </td>
+                <td class="acciones-celda">
+                    <a href="{% url 'detalleTarea' tarea.id %}" class="boton boton-sm" title="Ver detalle">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    {% if request.session.rol == 'profesor' %}
+                        <a href="{% url 'editarTarea' tarea.id %}" class="boton boton-sm boton-secundario" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'eliminarTarea' tarea.id %}" class="boton boton-sm boton-rojo" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="bi bi-inbox"></i>
+    <p>No hay tareas que coincidan con los filtros aplicados.</p>
+    {% if request.session.rol == 'profesor' %}
+        <a href="{% url 'crearTarea' %}" class="boton"><i class="bi bi-plus-circle"></i> Crear primera tarea</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

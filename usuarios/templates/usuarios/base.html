@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Sistema de Tareas{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .navbar {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+        }
+
+        .navbar-links {
+            flex-shrink: 1;
+            min-width: 0;
+            overflow-x: auto;
+        }
+
+        .navbar-right {
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            min-width: max-content;
+        }
+
+        .navbar-user {
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+            min-width: max-content;
+        }
+
+        .rol-chip {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+{% if request.session.correo %}
+<!-- ══ NAVBAR (solo si hay sesión) ══ -->
+<nav class="navbar">
+
+    <!-- Logo / Brand -->
+    <a class="navbar-brand" href="{% url 'dashboard' %}">
+        <i class="bi bi-check2-square"></i>
+        Sistema de Tareas
+    </a>
+
+    <!-- Links según rol -->
+    <ul class="navbar-links">
+
+        <li>
+            <a href="{% url 'dashboard' %}">
+                <i class="bi bi-speedometer2"></i> Inicio
+            </a>
+        </li>
+
+        {% if request.session.rol == 'profesor' %}
+            <!-- ── Menú PROFESOR ── -->
+            <li>
+                <a href="{% url 'crearTarea' %}">
+                    <i class="bi bi-plus-circle"></i> Nueva tarea
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'listarTareas' %}">
+                    <i class="bi bi-card-checklist"></i> Tareas
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'listar_agendas' %}">
+                    <i class="bi bi-calendar3"></i> Agenda
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'generarReporte' %}">
+                    <i class="bi bi-bar-chart"></i> Reportes
+                </a>
+            </li>
+
+        {% else %}
+            <!-- ── Menú ESTUDIANTE ── -->
+            <li>
+                <a href="{% url 'listarTareas' %}">
+                    <i class="bi bi-card-checklist"></i> Mis tareas
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'listar_agendas' %}">
+                    <i class="bi bi-calendar3"></i> Agenda
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'historialReportes' %}">
+                    <i class="bi bi-clock-history"></i> Historial
+                </a>
+            </li>
+        {% endif %}
+
+    </ul>
+
+    <!-- Zona derecha: avatar + nombre + logout -->
+    <div class="navbar-right">
+
+        <span class="rol-chip rol-{{ request.session.rol }}">
+            {{ request.session.rol }}
+        </span>
+
+        <div class="navbar-user">
+            {% if request.session.foto_perfil %}
+                <img src="{{ MEDIA_URL }}{{ request.session.foto_perfil }}"
+                     alt="Foto" class="nav-avatar">
+            {% else %}
+                <div class="nav-avatar-placeholder">
+                    {{ request.session.nombre|slice:":1"|upper }}
+                </div>
+            {% endif %}
+            <a href="{% url 'perfilUsuario' %}" style="color:#a0aec0;">
+                {{ request.session.nombre }}
+            </a>
+        </div>
+
+        <a href="{% url 'logout' %}" style="color:#e57373; padding:8px 10px; border-radius:4px;"
+           title="Cerrar sesión">
+            <i class="bi bi-box-arrow-right"></i>
+        </a>
+    </div>
+
+</nav>
+{% endif %}
+
+<!-- ══ CONTENIDO PRINCIPAL ══ -->
+<div class="main-content">
+
+    {% if request.session.mensaje %}
+        <div class="flash-msg flash-exito">
+            <i class="bi bi-check-circle"></i>
+            {{ request.session.mensaje }}
+        </div>
+        {% comment %}Limpiar el mensaje flash{% endcomment %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

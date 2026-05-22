@@ -1,0 +1,207 @@
+{% extends 'usuarios/base.html' %}
+{% load static %}
+
+{% block titulo %}Dashboard{% endblock %}
+{% block content %}
+ <link rel="stylesheet" href="{% static 'style.css' %}">
+<div class="bienvenida">
+    <h1>
+        {% if rol == 'profesor' %}👨‍🏫{% else %}🎓{% endif %}
+        Hola, {{ nombre }}
+    </h1>
+    <p>
+        {% if rol == 'profesor' %}
+            Panel de profesor — gestiona tareas, agendas y reportes.
+        {% else %}
+            Panel de estudiante — revisa tus tareas y próximas entregas.
+        {% endif %}
+    </p>
+</div>
+
+<!-- ══════════════════════ PROFESOR ══════════════════════ -->
+{% if rol == 'profesor' %}
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon azul"><i class="bi bi-list-check"></i></div>
+            <div>
+                <div class="stat-numero">{{ total_tareas }}</div>
+                <div class="stat-label">Total de tareas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon naranja"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="stat-numero">{{ tareas_pendientes }}</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon morado"><i class="bi bi-arrow-repeat"></i></div>
+            <div>
+                <div class="stat-numero">{{ tareas_en_proceso }}</div>
+                <div class="stat-label">En proceso</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon verde"><i class="bi bi-check-circle"></i></div>
+            <div>
+                <div class="stat-numero">{{ tareas_completadas }}</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Actividad reciente -->
+    <div class="seccion">
+        <div class="seccion-titulo">
+            <i class="bi bi-clock-history"></i> Actividad reciente
+        </div>
+        {% if actividad_reciente %}
+            <table class="tabla-dash">
+                <thead>
+                    <tr>
+                        <th>Tarea</th>
+                        <th>Estado</th>
+                        <th>Fecha creación</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tarea in actividad_reciente %}
+                    <tr>
+                        <td><strong>{{ tarea.titulo }}</strong></td>
+                        <td>
+                            <span class="badge badge-{{ tarea.estadoTarea }}">
+                                {{ tarea.get_estadoTarea_display }}
+                            </span>
+                        </td>
+                        <td>{{ tarea.fechaCreacion|date:"d M Y, H:i" }}</td>
+                        <td>
+                            <a href="{% url 'detalleTarea' tarea.id %}">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="sin-datos"><i class="bi bi-inbox"></i> No hay tareas creadas aún.</p>
+        {% endif %}
+    </div>
+
+
+<!-- ══════════════════════ ESTUDIANTE ══════════════════════ -->
+{% else %}
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon azul"><i class="bi bi-list-check"></i></div>
+            <div>
+                <div class="stat-numero">{{ total_tareas }}</div>
+                <div class="stat-label">Total de tareas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon naranja"><i class="bi bi-hourglass-split"></i></div>
+            <div>
+                <div class="stat-numero">{{ tareas_pendientes_lista|length }}</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon verde"><i class="bi bi-check-circle"></i></div>
+            <div>
+                <div class="stat-numero">{{ tareas_completadas }}</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon morado"><i class="bi bi-graph-up"></i></div>
+            <div>
+                <div class="stat-numero">{{ promedio }}%</div>
+                <div class="stat-label">Progreso general</div>
+                <div class="progreso-wrap" style="width:90px">
+                    <div class="progreso-barra"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+
+        <!-- Tareas pendientes -->
+        <div class="seccion">
+            <div class="seccion-titulo">
+                <i class="bi bi-hourglass-split"></i> Tareas pendientes
+            </div>
+            {% if tareas_pendientes_lista %}
+                <table class="tabla-dash">
+                    <thead>
+                        <tr><th>Tarea</th><th>Estado</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for tarea in tareas_pendientes_lista %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'detalleTarea' tarea.id %}">{{ tarea.titulo }}</a>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ tarea.estadoTarea }}">
+                                    {{ tarea.get_estadoTarea_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="sin-datos">
+                    <i class="bi bi-check2-all"></i> ¡Sin tareas pendientes!
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- Próximas entregas (agenda) -->
+        <div class="seccion">
+            <div class="seccion-titulo">
+                <i class="bi bi-calendar-event"></i> Próximas entregas
+            </div>
+            {% if proximas_entregas %}
+                <table class="tabla-dash">
+                    <thead>
+                        <tr><th>Evento</th><th>Fecha</th><th>Prioridad</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for agenda in proximas_entregas %}
+                        <tr>
+                            <td>{{ agenda.titulo }}</td>
+                            <td>{{ agenda.fecha|date:"d M" }} {{ agenda.hora|time:"H:i" }}</td>
+                            <td>
+                                <span class="badge
+                                    {% if agenda.prioridad == 'alta' %}badge-pendiente
+                                    {% elif agenda.prioridad == 'media' %}badge-enProceso
+                                    {% else %}badge-completada{% endif %}">
+                                    {{ agenda.prioridad }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="sin-datos">
+                    <i class="bi bi-calendar-check"></i> Sin eventos próximos.
+                </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endif %}
+
+{% endblock %}

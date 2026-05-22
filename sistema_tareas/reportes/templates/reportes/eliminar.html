@@ -1,0 +1,22 @@
+{% extends 'reportes/base.html' %}
+{% load static %}
+{% block contenido %}
+
+<h2>Eliminar Reporte</h2>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+<p>
+¿Deseas eliminar el reporte
+<strong>{{ reporte.nombreReporte }}</strong>?
+</p>
+
+<form method="POST">
+
+    {% csrf_token %}
+
+    <button type="submit">
+        Sí, eliminar
+    </button>
+
+</form>
+
+{% endblock %}

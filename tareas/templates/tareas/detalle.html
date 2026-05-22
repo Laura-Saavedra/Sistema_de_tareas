@@ -1,26 +1,235 @@
+{% extends "usuarios/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Detalle de Tarea</title>
+
+{% block titulo %}{{ tarea.titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-file-text"></i> {{ tarea.titulo }}</h2>
     <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-    <div class="contenedor">
-        <h1>Detalle de Tarea</h1>
 
-        <p><strong>Título:</strong> {{ tarea.titulo }}</p>
-        <hr>
-        <p><strong>Descripción:</strong> {{ tarea.descripcion }}</p>
-        <hr>
-        <p><strong>Estado:</strong> {{ tarea.estadoTarea }}</p>
-        <hr>
-        <p><strong>Fecha de creación:</strong> {{ tarea.fechaCreacion }}</p>
-
-        <br>
-        <a href="{% url 'editarTarea' tarea.id %}" class="boton">Editar</a>
-        <a href="{% url 'eliminarTarea' tarea.id %}" class="boton-rojo">Eliminar</a>
-        <a href="{% url 'listarTareas' %}">Volver a mis tareas</a>
+    <div class="header-actions">
+        {% if rol == 'profesor' %}
+            <a href="{% url 'editarTarea' tarea.id %}" class="boton boton-secundario">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a href="{% url 'calificarTarea' tarea.id %}" class="boton">
+                <i class="bi bi-star"></i> Calificar
+            </a>
+        {% endif %}
+        <a href="{% url 'listarTareas' %}" class="boton boton-secundario">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
     </div>
-</body>
-</html>
+</div>
+
+<div class="detalle-grid">
+
+    <!-- Columna izquierda: info principal -->
+    <div class="detalle-main">
+
+        <!-- Datos de la tarea -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-info-circle"></i> Información de la tarea
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-flag"></i> Estado</span>
+                        <span class="badge badge-estado-{{ tarea.estadoTarea }}">
+                            {{ tarea.get_estadoTarea_display }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-exclamation-triangle"></i> Prioridad</span>
+                        <span class="badge badge-prioridad-{{ tarea.prioridad }}">
+                            {{ tarea.get_prioridad_display }}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-calendar-event"></i> Fecha de entrega</span>
+                        <span>{{ tarea.fechaEntrega|default:"Sin fecha" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-clock"></i> Creada</span>
+                        <span>{{ tarea.fechaCreacion|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    {% if tarea.estudianteCorreo %}
+                    <div class="info-item">
+                        <span class="info-label"><i class="bi bi-person"></i> Estudiante</span>
+                        <span>{{ tarea.estudianteCorreo }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                {% if tarea.descripcion %}
+                <div class="descripcion-bloque">
+                    <p class="info-label"><i class="bi bi-text-paragraph"></i> Descripción</p>
+                    <p>{{ tarea.descripcion|linebreaksbr }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Adjuntos -->
+                {% if tarea.adjuntos %}
+                <div class="adjuntos-bloque">
+                    <p class="info-label"><i class="bi bi-paperclip"></i> Adjuntos</p>
+                    <ul class="adjuntos-lista">
+                        {% for adj in tarea.adjuntos %}
+                        <li>
+                            <i class="bi bi-file-earmark"></i>
+                            <a href="/media/tareas_adjuntos/{{ adj.guardado }}" target="_blank">
+                                {{ adj.original }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Cambio de estado — estudiante -->
+        {% if rol == 'estudiante' and tarea.estadoTarea in 'pendiente enProceso' %}
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat"></i> Actualizar estado
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="cambiar_estado" value="1">
+                    <div class="estado-acciones">
+                        {% if tarea.estadoTarea == 'pendiente' %}
+                        <button type="submit" name="nuevo_estado" value="enProceso" class="boton boton-secundario">
+                            <i class="bi bi-play-circle"></i> Marcar en proceso
+                        </button>
+                        {% endif %}
+                        {% if tarea.estadoTarea == 'enProceso' %}
+                        <button type="submit" name="nuevo_estado" value="entregada" class="boton">
+                            <i class="bi bi-upload"></i> Marcar como entregada
+                        </button>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Cambio de estado — profesor -->
+        {% if rol == 'profesor' %}
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-arrow-repeat"></i> Cambiar estado
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'cambiarEstado' tarea.id %}">
+                    {% csrf_token %}
+                    <div class="estado-acciones">
+                        <select name="estado" class="select-estado">
+                            {% for val, label in tarea.ESTADOS %}
+                                <option value="{{ val }}" {% if tarea.estadoTarea == val %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="boton">
+                            <i class="bi bi-check2"></i> Aplicar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Calificación -->
+        {% if calificacion %}
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-star-fill"></i> Calificación
+            </div>
+            <div class="card-body">
+                <div class="calificacion-bloque">
+                    <span class="nota-grande">{{ calificacion.nota }} / 5.0</span>
+                    {% if calificacion.observaciones %}
+                        <p class="observaciones">{{ calificacion.observaciones }}</p>
+                    {% endif %}
+                    <small class="texto-gris">
+                        Calificado por {{ calificacion.profesorNombre }}
+                        el {{ calificacion.fecha|date:"d/m/Y" }}
+                    </small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Comentarios -->
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-chat-left-text"></i> Comentarios ({{ comentarios|length }})
+            </div>
+            <div class="card-body">
+                {% if comentarios %}
+                <div class="comentarios-lista">
+                    {% for c in comentarios %}
+                    <div class="comentario comentario-{{ c.autorRol }}">
+                        <div class="comentario-header">
+                            <span class="comentario-autor">
+                                <i class="bi bi-person-circle"></i>
+                                {{ c.autorNombre }}
+                            </span>
+                            <span class="rol-chip rol-{{ c.autorRol }}">{{ c.autorRol }}</span>
+                            <span class="comentario-fecha texto-gris">{{ c.fecha|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <p class="comentario-texto">{{ c.texto }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                    <p class="texto-gris"><i class="bi bi-chat-square"></i> Aún no hay comentarios.</p>
+                {% endif %}
+
+                <!-- Nuevo comentario -->
+                <div class="nuevo-comentario">
+                    <p class="info-label"><i class="bi bi-pencil-square"></i> Agregar comentario</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form_comentario.texto }}
+                        <button type="submit" name="enviar_comentario" value="1" class="boton" style="margin-top:8px;">
+                            <i class="bi bi-send"></i> Enviar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /detalle-main -->
+
+    <!-- Columna derecha: historial -->
+    <div class="detalle-sidebar">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Historial
+            </div>
+            <div class="card-body">
+                {% if historial %}
+                <ul class="historial-lista">
+                    {% for h in historial %}
+                    <li class="historial-item">
+                        <i class="bi bi-circle-fill historial-punto"></i>
+                        <div>
+                            <span class="historial-accion">{{ h.accion }}</span><br>
+                            <small class="texto-gris">
+                                {{ h.usuarioNombre }} — {{ h.fecha|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p class="texto-gris">Sin historial registrado.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div><!-- /detalle-grid -->
+{% endblock %}

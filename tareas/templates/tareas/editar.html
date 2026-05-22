@@ -1,39 +1,141 @@
+{% extends "usuarios/base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Editar Tarea</title>
+
+{% block titulo %}Editar: {{ tarea.titulo }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-pencil-square"></i> Editar Tarea</h2>
     <link rel="stylesheet" href="{% static 'style.css' %}">
-</head>
-<body>
-    <div class="contenedor">
-        <h1>Editar Tarea</h1>
 
-        <form method="POST">
-            {% csrf_token %}
+    <a href="{% url 'detalleTarea' tarea.id %}" class="boton boton-secundario">
+        <i class="bi bi-arrow-left"></i> Volver al detalle
+    </a>
+</div>
 
-            <p>
-                <label>Título</label><br>
-                <input type="text" name="titulo" value="{{ tarea.titulo }}">
-            </p>
+<div class="form-card">
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
 
-            <p>
-                <label>Descripción</label><br>
-                <textarea name="descripcion">{{ tarea.descripcion }}</textarea>
-            </p>
+        {% if form.errors %}
+        <div class="flash-msg flash-error">
+            <i class="bi bi-exclamation-triangle"></i>
+            Revisa los campos marcados en rojo.
+        </div>
+        {% endif %}
 
-            <p>
-                <label>Estado</label><br>
-                <select name="estadoTarea">
-                    <option value="pendiente" {% if tarea.estadoTarea == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                    <option value="enProceso" {% if tarea.estadoTarea == 'enProceso' %}selected{% endif %}>En Proceso</option>
-                    <option value="completada" {% if tarea.estadoTarea == 'completada' %}selected{% endif %}>Completada</option>
+        <div class="form-grid">
+
+            <!-- Título -->
+            <div class="form-group full-width">
+                <label for="{{ form.titulo.id_for_label }}">
+                    <i class="bi bi-type"></i> Título <span class="requerido">*</span>
+                </label>
+                {{ form.titulo }}
+                {% if form.titulo.errors %}
+                    <span class="field-error">{{ form.titulo.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Descripción -->
+            <div class="form-group full-width">
+                <label for="{{ form.descripcion.id_for_label }}">
+                    <i class="bi bi-text-paragraph"></i> Descripción
+                </label>
+                {{ form.descripcion }}
+                {% if form.descripcion.errors %}
+                    <span class="field-error">{{ form.descripcion.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Estado -->
+            <div class="form-group">
+                <label for="{{ form.estadoTarea.id_for_label }}">
+                    <i class="bi bi-flag"></i> Estado
+                </label>
+                {{ form.estadoTarea }}
+                {% if form.estadoTarea.errors %}
+                    <span class="field-error">{{ form.estadoTarea.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Prioridad -->
+            <div class="form-group">
+                <label for="{{ form.prioridad.id_for_label }}">
+                    <i class="bi bi-exclamation-triangle"></i> Prioridad
+                </label>
+                {{ form.prioridad }}
+                {% if form.prioridad.errors %}
+                    <span class="field-error">{{ form.prioridad.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Fecha de entrega -->
+            <div class="form-group">
+                <label for="{{ form.fechaEntrega.id_for_label }}">
+                    <i class="bi bi-calendar-event"></i> Fecha de entrega
+                </label>
+                {{ form.fechaEntrega }}
+                {% if form.fechaEntrega.errors %}
+                    <span class="field-error">{{ form.fechaEntrega.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Estudiante asignado -->
+            <div class="form-group full-width">
+                <label for="{{ form.estudianteCorreo.id_for_label }}">
+                    <i class="bi bi-person"></i> Asignar a estudiante
+                </label>
+                <select name="estudianteCorreo" id="{{ form.estudianteCorreo.id_for_label }}">
+                    <option value="">— Sin asignar —</option>
+                    {% for est in estudiantes %}
+                        <option value="{{ est.correo }}"
+                            {% if tarea.estudianteCorreo == est.correo %}selected{% endif %}>
+                            {{ est.nombre }} {{ est.apellido }} ({{ est.correo }})
+                        </option>
+                    {% endfor %}
                 </select>
-            </p>
+                {% if form.estudianteCorreo.errors %}
+                    <span class="field-error">{{ form.estudianteCorreo.errors.0 }}</span>
+                {% endif %}
+            </div>
 
-            <button type="submit">Actualizar tarea</button>
-            <a href="{% url 'listarTareas' %}">Cancelar</a>
-        </form>
-    </div>
-</body>
-</html>
+            <!-- Adjuntos actuales -->
+            {% if tarea.adjuntos %}
+            <div class="form-group full-width">
+                <label><i class="bi bi-paperclip"></i> Adjuntos actuales</label>
+                <ul class="adjuntos-lista">
+                    {% for adj in tarea.adjuntos %}
+                    <li>
+                        <i class="bi bi-file-earmark"></i>
+                        <a href="/media/tareas_adjuntos/{{ adj.guardado }}" target="_blank">
+                            {{ adj.original }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <!-- Nuevos adjuntos -->
+            <div class="form-group full-width">
+                <label>
+                    <i class="bi bi-cloud-upload"></i> Agregar adjuntos
+                </label>
+                <input type="file" name="adjuntos" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.txt">
+                <small class="field-hint">Los nuevos archivos se añadirán a los ya existentes.</small>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="boton">
+                <i class="bi bi-floppy"></i> Guardar cambios
+            </button>
+            <a href="{% url 'detalleTarea' tarea.id %}" class="boton boton-secundario">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
